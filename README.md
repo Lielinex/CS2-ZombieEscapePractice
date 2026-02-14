@@ -1,103 +1,80 @@
-# ZombieEscapePractice
+﻿# Zombie Escape Practice 插件
 
-## Useful Links
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Metamod: Source](https://img.shields.io/badge/Metamod%3ASource)
+![CounterStrikeSharp](https://img.shields.io/badge/CounterStrikeSharp-1.0+-blue)
 
-## Quick Start with Git
+**Zombie Escape Practice** 是一个为 CS2 Zombie Escape模式中的弹幕图、跳刀图设计的练习插件，允许玩家通过简单的菜单命令直接跳转到地图中的特定节点（跳刀、弹幕、BOSS 战），跳过冗长的跑图流程。基于 CounterStrikeSharp 开发，配置灵活，支持创意工坊地图 ID 自动识别。
 
-Before you start, make sure you have created a new repository on GitHub.
+## ✨ 特性
 
-1. **Initialize a Git repository**
+- **快速跳转**：一键传送所有玩家到配置好的挑战位置。
+- **灵活配置**：每个地图可配置多个挑战节点，支持自定义触发命令（如激活实体、生成物体）。
+- **智能地图识别**：优先使用创意工坊地图 ID 作为配置键，兼容普通地图名。
+- **简单易用**：玩家通过聊天框菜单发送!prac或者!practice后选择，无需管理员权限
 
-   Start by initializing a new Git repository with the following command:
+## 📦 安装
 
-   ```bash
-   git init
-   ```
+1. **安装依赖**：确保服务器已正确安装最新版[Metamod: Source](https://sourcemm.net/downloads.php?branch=dev)和[CounterStrikeSharp](https://docs.cssharp.dev/) (版本 ≥ 1.0)。
+2. **下载插件**：从 [Releases](https://github.com/Lielinex/CS2-ZombieEscapePractice/releases) 下载最新版的 `ZombieEscapePractice.zip`。
+3. **放置文件**：将 `ZombieEscapePractice.zip` 解压后放入服务器的 `csgo/addons/counterstrikesharp/plugins/` 目录。
+4. **启动服务器**
 
-2. **Add a remote repository**
+首次启动后，插件会在插件目录自动生成 `challenges.json` 配置文件，您可以根据需要修改。或者使用我另外提供的文件。
 
-   Next, add a remote repository. Replace `https://github.com/username/repository.git` with the URL of your own repository:
+可选依赖：很多ZombieEscape地图都需要[CS2Fixes](https://github.com/Source2ZE/CS2Fixes)插件才能正常运行，您可以考虑是否需要安装该插件。
 
-   ```bash
-   git remote add origin https://github.com/username/repository.git
-   ```
+## ⚙️ 配置
 
-3. **Create a new branch**
+配置文件位于 `csgo/addons/counterstrikesharp/plugins/ZombieEscapePractice/challenges.json`，采用 JSON 格式。结构如下：
 
-   Create a new branch and switch to it. The `-M` option will force Git to create the branch if it doesn't exist:
-
-   ```bash
-   git branch -M main
-   ```
-
-4. **Stage your changes**
-
-   Stage all changes in the directory:
-
-   ```bash
-   git add .
-   ```
-
-5. **Commit your changes**
-
-   Commit your staged changes with a descriptive message:
-
-   ```bash
-   git commit -m "your commit message"
-   ```
-
-6. **Push your changes to GitHub**
-
-   Finally, push your commits to the remote repository:
-
-   ```bash
-   git push -u origin main
-   ```
-
-### Working with Plugin Versions
-
-Your plugin's version is automatically updated when you push commit messages containing `#major`, `#minor`, or `#patch`. These keywords trigger a version bump:
-
-- `#major`: Triggers a major version bump (e.g., 1.0.0 to 2.0.0).
-- `#minor`: Triggers a minor version bump (e.g., 1.0.0 to 1.1.0).
-- `#patch`: Triggers a patch version bump (e.g., 1.0.0 to 1.0.1).
-
-For example, if you want to increase the minor version, your commit message might look like this:
-
-```bash
-git commit -m "add new feature #minor"
-```
-
-Upon pushing a commit with one of these keywords, a GitHub Action is triggered. This action builds your plugin with the specified version and creates a new release.
-
-In addition to automatic version bumps through commit messages, this workflow also supports manual versioning through `workflow_dispatch`.
-
-You can manually specify a version by triggering the `workflow_dispatch` event from the GitHub Actions tab. After setting the version, the workflow will build your plugin with the specified version and create a new release, similar to the process that occurs when you push a commit with `#minor`, `#major`, or `#patch` in the message.
-
-For example, to manually trigger a workflow with a specific version:
-
-1. Go to the 'Actions' tab in your GitHub repository.
-2. From the left menu, select the 'Build & Release' workflow you want to run.
-3. Click 'Run workflow'.
-4. Enter the version you want to use in the 'Plugin Version' field.
-5. Click 'Run workflow'.
-
-This will trigger the workflow with the specified version, build your plugin, and create a new release.
-
-### GitHub Actions Workflow Environment Variables
-
-In the `dotnet.yml` file, several environment variables are defined under the `env` section:
-
-- `PLUGIN_NAME`: The name of your plugin.
-- `DOTNET_VERSION`: The version of .NET you are using in your project. Currently, it's set to `8.0`.
-- `PATH_PLUGIN`: The path where your plugin is located. Here, it's `addons/counterstrikesharp/plugins/`.
-- `START_VERSION`: The starting version of your project. It's set to `1.0.0`.
-- `USE_V_VERSION`: A boolean value indicating whether to prefix the version number with a 'v'. If set to `true`, your version will look like `v1.0.0`.
-  
-You can modify these variables according to your project's needs.
-
-## Conclusion
-
-That's all you need to know about managing your plugin's version with GitHub. Remember, you can either push a commit with `#major`, `#minor`, or `#patch` in the message for automatic versioning, or manually set a version using `workflow_dispatch`.
-
-**Good luck with your plugin development!**
+```json
+{
+  "maps": {
+    "123456789": {                     // 创意工坊地图 ID 或地图名
+      "challenges": [
+        {
+          "name": "跳刀练习 - 第一阶段", // 菜单显示的名称
+          "position": {                // 传送坐标 (X, Y, Z)
+            "x": -1234.5,
+            "y": 567.8,
+            "z": 900.1
+          },
+          "command": "ent_fire xxxxx trigger" // 服务器执行的命令，具体命令请自行配置
+        },
+        {
+          "name": "弹幕练习 - 第二阶段",
+          "position": { "x": 1000.0, "y": 2000.0, "z": 300.0 },
+          "command": "ent_fire xxxxx_controller activate"
+        }
+      ]
+    },
+    "ze_example_map": {                 // 使用地图名作为键的示例
+      "challenges": [
+        {
+          "name": "BOSS 战练习",
+          "position": { "x": 500.0, "y": -500.0, "z": 128.0 },
+          "command": "ent_fire boss_relay trigger"
+        }
+      ]
+    }
+    "987654321": {
+      "challenges": [
+        {
+          "name": "跑路练习 - 传送点",
+          "position": { "x": 2000, "y": 3000, "z": 512 },
+          "command": ""                  // 留空不执行命令
+        }
+      ]
+    },
+    "ze_no_teleport": {
+      "challenges": [
+        {
+          "name": "弹幕启动 - 仅命令",
+                                          // 不写"position"不执行传送
+          "command": "ent_fire barrage_controller activate"
+        }
+        ]
+    }
+  }
+}
