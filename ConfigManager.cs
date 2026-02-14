@@ -16,7 +16,7 @@ namespace ZombieEscapePractice
     public class ChallengeConfig
     {
         [JsonPropertyName("name")] public string Name { get; set; } = "";
-        [JsonPropertyName("position")] public PositionConfig Position { get; set; } = new();
+        [JsonPropertyName("position")] public PositionConfig? Position { get; set; } // 可空
         [JsonPropertyName("command")] public string Command { get; set; } = "";
     }
 
@@ -59,40 +59,46 @@ namespace ZombieEscapePractice
         private void CreateDefaultConfig()
         {
             Config = new PluginConfig();
-            // 添加示例数据
+            // 示例1：同时有传送和命令
             Config.Maps["123456789"] = new MapConfig
             {
                 Challenges = new List<ChallengeConfig>
-                {
-                    new ChallengeConfig
-                    {
-                        Name = "跳刀练习 - 第一阶段",
-                        Position = new PositionConfig { X = -1234.5f, Y = 567.8f, Z = 900.1f },
-                        Command = "ent_fire knife_spawner addoutput origin -1234.5 567.8 900.1"
-                    },
-                    new ChallengeConfig
-                    {
-                        Name = "弹幕练习 - 第二阶段",
-                        Position = new PositionConfig { X = 1000.0f, Y = 2000.0f, Z = 300.0f },
-                        Command = "ent_fire barrage_controller activate"
-                    }
-                }
+        {
+            new ChallengeConfig
+            {
+                Name = "跳刀练习 - 第一阶段",
+                Position = new PositionConfig { X = -1234.5f, Y = 567.8f, Z = 900.1f },
+                Command = "ent_fire knife_spawner addoutput origin -1234.5 567.8 900.1"
+            }
+        }
             };
-            // 添加一个以地图名为键的示例
-            Config.Maps["ze_example_map"] = new MapConfig
+            // 示例2：只有传送（无命令）
+            Config.Maps["987654321"] = new MapConfig
             {
                 Challenges = new List<ChallengeConfig>
-                {
-                    new ChallengeConfig
-                    {
-                        Name = "BOSS战练习",
-                        Position = new PositionConfig { X = 500.0f, Y = -500.0f, Z = 128.0f },
-                        Command = "ent_fire boss_relay trigger"
-                    }
-                }
+        {
+            new ChallengeConfig
+            {
+                Name = "跑路练习 - 传送点",
+                Position = new PositionConfig { X = 2000f, Y = 3000f, Z = 512f },
+                Command = "" // 明确留空，不执行命令
+            }
+        }
+            };
+            // 示例3：只有命令（无传送）
+            Config.Maps["ze_no_teleport"] = new MapConfig
+            {
+                Challenges = new List<ChallengeConfig>
+        {
+            new ChallengeConfig
+            {
+                Name = "弹幕启动 - 仅命令",
+                Position = null, // 不传送
+                Command = "ent_fire barrage_controller activate"
+            }
+        }
             };
             Save();
-            Console.WriteLine("[ZombieEscapePractice] 已生成默认配置文件: " + _configPath);
         }
 
         public void Save()

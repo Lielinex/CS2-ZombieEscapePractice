@@ -12,9 +12,9 @@
 			<HintPath>D:/dev/CS2PluginsDev/addons/counterstrikesharp/api/CounterStrikeSharp.API.dll</HintPath>
 	    </PackageReference>
     </ItemGroup>
-
-    <ItemGroup>
-        <None Update="lang\**\*.*" CopyToOutputDirectory="PreserveNewest" />
-    </ItemGroup>
+	
+	<ItemGroup>
+		<EmbeddedResource Include="lang\*.json" />
+	</ItemGroup>
 
 </Project>

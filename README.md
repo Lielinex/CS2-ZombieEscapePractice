@@ -1,10 +1,10 @@
-# Zombie Escape Practice 插件
+﻿# Zombie Escape Practice 插件
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Metamod: Source](https://img.shields.io/badge/Metamod%3ASource)
 ![CounterStrikeSharp](https://img.shields.io/badge/CounterStrikeSharp-1.0+-blue)
 
-**Zombie Escape Practice** 是一个为 CS2 僵尸逃跑模式中的弹幕图、跳刀图设计的练习插件，允许玩家通过简单的菜单命令直接跳转到地图中的特定节点（跳刀、弹幕、BOSS 战），跳过冗长的跑图流程。基于 CounterStrikeSharp 开发，配置灵活，支持创意工坊地图 ID 自动识别。
+**Zombie Escape Practice** 是一个为 CS2 Zombie Escape模式中的弹幕图、跳刀图设计的练习插件，允许玩家通过简单的菜单命令直接跳转到地图中的特定节点（跳刀、弹幕、BOSS 战），跳过冗长的跑图流程。基于 CounterStrikeSharp 开发，配置灵活，支持创意工坊地图 ID 自动识别。
 
 ## ✨ 特性
 
@@ -21,6 +21,8 @@
 4. **启动服务器**
 
 首次启动后，插件会在插件目录自动生成 `challenges.json` 配置文件，您可以根据需要修改。或者使用我另外提供的文件。
+
+可选依赖：很多ZombieEscape地图都需要[CS2Fixes](https://github.com/Source2ZE/CS2Fixes)插件才能正常运行，您可以考虑是否需要安装该插件。
 
 ## ⚙️ 配置
 

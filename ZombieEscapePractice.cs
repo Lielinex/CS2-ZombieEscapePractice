@@ -1,5 +1,6 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Menu;
@@ -12,9 +13,8 @@ namespace ZombieEscapePractice
     public class ChallengePlugin : BasePlugin
     {
         public override string ModuleName => "Zombie Escape Practice";
-        public override string ModuleDescription => "";
-        public override string ModuleVersion => "1.1.0";
-        public override string ModuleAuthor => "Lielinex";
+        public override string ModuleVersion => "1.3.0";
+
         private ConfigManager _configManager = new();
         private bool _isPracticeActive = false;
 
@@ -22,8 +22,8 @@ namespace ZombieEscapePractice
         {
             _configManager.Load(ModuleDirectory);
 
-            AddCommand("css_practice", "打开挑战练习菜单", CommandPractice);
-            AddCommand("css_prac", "打开挑战练习菜单", CommandPractice);
+            AddCommand("css_practice", "Open challenge practice menu", CommandPractice);
+            AddCommand("css_prac", "Open challenge practice menu", CommandPractice);
 
             RegisterEventHandler<EventRoundStart>(OnRoundStart);
             RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
@@ -35,15 +35,14 @@ namespace ZombieEscapePractice
 
             if (_isPracticeActive)
             {
-                player.PrintToChat(" [练习] 当前已有激活的练习，请等待回合结束。");
+                player.PrintToChat(Localizer.ForPlayer(player, "practice.active"));
                 return;
             }
 
-            // 获取当前地图标识（优先使用Workshop ID，若无则用地名）
             string mapKey = GetCurrentMapKey();
             if (!_configManager.Config.Maps.TryGetValue(mapKey, out var mapConfig) || mapConfig.Challenges.Count == 0)
             {
-                player.PrintToChat($" [练习] 当前地图 ({mapKey}) 没有配置挑战。");
+                player.PrintToChat(Localizer.ForPlayer(player, "practice.no_challenges", mapKey));
                 return;
             }
 
@@ -52,19 +51,17 @@ namespace ZombieEscapePractice
 
         private string GetCurrentMapKey()
         {
-            // 尝试获取Workshop ID
             var convar = ConVar.Find("host_workshop_map");
             if (convar != null && !string.IsNullOrEmpty(convar.StringValue))
             {
                 return convar.StringValue;
             }
-            // 降级使用地图名
             return Server.MapName;
         }
 
         private void ShowChallengeMenu(CCSPlayerController player, List<ChallengeConfig> challenges)
         {
-            var menu = new ChatMenu("选择挑战节点");
+            var menu = new ChatMenu(Localizer.ForPlayer(player, "menu.title"));
             foreach (var challenge in challenges)
             {
                 menu.AddMenuOption(challenge.Name, (p, option) =>
@@ -77,28 +74,35 @@ namespace ZombieEscapePractice
 
         private void ExecuteChallenge(ChallengeConfig challenge)
         {
-            // 执行触发命令
             if (!string.IsNullOrEmpty(challenge.Command))
             {
                 Server.ExecuteCommand(challenge.Command);
             }
 
-            // 传送所有玩家到指定位置
-            Vector targetPos = new Vector(challenge.Position.X, challenge.Position.Y, challenge.Position.Z);
-            var players = Utilities.GetPlayers();
-            foreach (var player in players)
+            if (challenge.Position != null)
             {
-                if (player != null && player.IsValid && player.PlayerPawn.IsValid)
+                Vector targetPos = new Vector(challenge.Position.X, challenge.Position.Y, challenge.Position.Z);
+                var players = Utilities.GetPlayers();
+                foreach (var player in players)
                 {
-                    player.PlayerPawn.Value.Teleport(targetPos, player.PlayerPawn.Value.EyeAngles, new Vector(0, 0, 0));
+                    if (player != null && player.IsValid && player.PlayerPawn.IsValid)
+                    {
+                        player.PlayerPawn.Value.Teleport(targetPos, player.PlayerPawn.Value.EyeAngles, new Vector(0, 0, 0));
+                    }
                 }
             }
 
-            // 激活练习状态，禁用菜单
             _isPracticeActive = true;
 
-            // 提示所有玩家
-            Server.PrintToChatAll($" [练习] 已激活挑战: {challenge.Name}，练习进行中...");
+            // 为每个玩家发送本地化提示
+            var allPlayers = Utilities.GetPlayers();
+            foreach (var player in allPlayers)
+            {
+                if (player != null && player.IsValid)
+                {
+                    player.PrintToChat(Localizer.ForPlayer(player, "practice.activated", challenge.Name));
+                }
+            }
         }
 
         private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
