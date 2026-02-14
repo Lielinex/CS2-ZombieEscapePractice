@@ -1,27 +1,26 @@
 # Zombie Escape Practice 插件
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Metamod: Source](https://img.shields.io/badge/Metamod%3ASource)
 ![CounterStrikeSharp](https://img.shields.io/badge/CounterStrikeSharp-1.0+-blue)
 
-**Zombie Escape Practice** 是一个为 CS2 僵尸逃跑模式中的弹幕图、跳刀图设计的练习插件，允许玩家通过简单的菜单命令直接跳转到地图中的特定挑战节点（如跳刀、弹幕、BOSS 战），跳过冗长的流程。基于 CounterStrikeSharp 开发，配置灵活，支持创意工坊地图 ID 自动识别。
+**Zombie Escape Practice** 是一个为 CS2 僵尸逃跑模式中的弹幕图、跳刀图设计的练习插件，允许玩家通过简单的菜单命令直接跳转到地图中的特定节点（跳刀、弹幕、BOSS 战），跳过冗长的跑图流程。基于 CounterStrikeSharp 开发，配置灵活，支持创意工坊地图 ID 自动识别。
 
 ## ✨ 特性
 
 - **快速跳转**：一键传送所有玩家到配置好的挑战位置。
 - **灵活配置**：每个地图可配置多个挑战节点，支持自定义触发命令（如激活实体、生成物体）。
 - **智能地图识别**：优先使用创意工坊地图 ID 作为配置键，兼容普通地图名。
-- **安全状态管理**：同一回合内只能激活一个练习，回合结束后自动重置，防止干扰正常游戏。
-- **简单易用**：玩家通过聊天框菜单选择，无需管理员权限。
-- **开箱即用**：首次运行自动生成示例配置文件，包含常用挑战示例。
+- **简单易用**：玩家通过聊天框菜单发送!prac或者!practice后选择，无需管理员权限
 
 ## 📦 安装
 
-1. **安装依赖**：确保服务器已正确安装最新版 [CounterStrikeSharp](https://docs.cssharp.dev/) (版本 ≥ 1.0)。
-2. **下载插件**：从 [Releases](https://github.com/yourname/zombie-escape-practice/releases) 下载最新版的 `ZombieEscapePractice.dll`。
-3. **放置文件**：将 `ZombieEscapePractice.dll` 放入服务器的 `csgo/addons/counterstrikesharp/plugins/ZombieEscapePractice/` 目录。
+1. **安装依赖**：确保服务器已正确安装最新版[Metamod: Source](https://sourcemm.net/downloads.php?branch=dev)和[CounterStrikeSharp](https://docs.cssharp.dev/) (版本 ≥ 1.0)。
+2. **下载插件**：从 [Releases](https://github.com/Lielinex/CS2-ZombieEscapePractice/releases) 下载最新版的 `ZombieEscapePractice.zip`。
+3. **放置文件**：将 `ZombieEscapePractice.zip` 解压后放入服务器的 `csgo/addons/counterstrikesharp/plugins/` 目录。
 4. **启动服务器**
 
-首次启动后，插件会在插件目录自动生成 `challenges.json` 配置文件，您可以根据需要修改。
+首次启动后，插件会在插件目录自动生成 `challenges.json` 配置文件，您可以根据需要修改。或者使用我另外提供的文件。
 
 ## ⚙️ 配置
 
@@ -56,6 +55,24 @@
           "command": "ent_fire boss_relay trigger"
         }
       ]
+    }
+    "987654321": {
+      "challenges": [
+        {
+          "name": "跑路练习 - 传送点",
+          "position": { "x": 2000, "y": 3000, "z": 512 },
+          "command": ""                  // 留空不执行命令
+        }
+      ]
+    },
+    "ze_no_teleport": {
+      "challenges": [
+        {
+          "name": "弹幕启动 - 仅命令",
+                                          // 不写"position"不执行传送
+          "command": "ent_fire barrage_controller activate"
+        }
+        ]
     }
   }
 }
