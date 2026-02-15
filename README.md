@@ -8,21 +8,21 @@
 
 ## ✨ 特性
 
-- **快速跳转**：一键传送所有玩家到配置好的挑战位置。
-- **灵活配置**：每个地图可配置多个挑战节点，支持自定义触发命令（如激活实体、生成物体）。
-- **智能地图识别**：优先使用创意工坊地图 ID 作为配置键，兼容普通地图名。
+- **快速跳转**：一键传送所有玩家到配置好的位置。
+- **灵活配置**：每个地图可配置多个训练节点，支持自定义触发命令（如c_entfire）。
+- **地图识别**：优先使用创意工坊地图 ID 作为配置键，兼容普通地图名(必须完整地图名)。
 - **简单易用**：玩家通过聊天框菜单发送!prac或者!practice后选择，无需管理员权限
 
 ## 📦 安装
 
-1. **安装依赖**：确保服务器已正确安装最新版[Metamod: Source](https://sourcemm.net/downloads.php?branch=dev)和[CounterStrikeSharp](https://docs.cssharp.dev/) (版本 ≥ 1.0)。
+1. **安装依赖**：确保服务器已正确安装最新版[Metamod: Source](https://sourcemm.net/downloads.php?branch=dev)和[CounterStrikeSharp](https://docs.cssharp.dev/)。
 2. **下载插件**：从 [Releases](https://github.com/Lielinex/CS2-ZombieEscapePractice/releases) 下载最新版的 `ZombieEscapePractice.zip`。
 3. **放置文件**：将 `ZombieEscapePractice.zip` 解压后放入服务器的 `csgo/addons/counterstrikesharp/plugins/` 目录。
 4. **启动服务器**
 
 首次启动后，插件会在插件目录自动生成 `challenges.json` 配置文件，您可以根据需要修改。或者使用我另外提供的文件。
 
-可选依赖：很多ZombieEscape地图都需要[CS2Fixes](https://github.com/Source2ZE/CS2Fixes)插件才能正常运行，您可以考虑是否需要安装该插件。
+可选依赖：很多ZombieEscape地图都需要[CS2Fixes](https://github.com/Source2ZE/CS2Fixes)插件才能正常运行，您可以考虑是否需要安装该插件。（若用我提供的配置文件则需要这个插件）
 
 ## ⚙️ 配置
 
@@ -72,7 +72,7 @@
         {
           "name": "弹幕启动 - 仅命令",
                                           // 不写"position"不执行传送
-          "command": "ent_fire barrage_controller activate"
+          "command": "[delay=10]ent_fire afk_tele2 Enable;ent_fire afk_tele1 Enable"  // 延时10秒执行afk2传送，立即执行afk1传送
         }
         ]
     }
