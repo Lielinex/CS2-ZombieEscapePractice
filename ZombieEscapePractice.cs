@@ -1,31 +1,381 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Menu;
-using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API.Modules.Timers;
+using CounterStrikeSharp.API.Modules.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ZombieEscapePractice
 {
     public class ChallengePlugin : BasePlugin
     {
-        public override string ModuleName => "Zombie Escape Practice";
-        public override string ModuleVersion => "1.3.0";
+        public override string ModuleName => "ZombieEscapePractice";
+        public override string ModuleDescription => "僵尸逃跑弹幕图练习插件";
+        public override string ModuleAuthor => "Lielinex";
+        public override string ModuleVersion => "3.5.4";
 
         private ConfigManager _configManager = new();
         private bool _isPracticeActive = false;
+        private Dictionary<string, BlockBase> _namedBlocks = new();
+        private Dictionary<string, BlockBase> _triggerableBlocks = new(); // 可触发的块
+        private Dictionary<string, CounterStrikeSharp.API.Modules.Timers.Timer> _repeatTimers = new(); // 存储重复块的定时器
 
         public override void Load(bool hotReload)
         {
             _configManager.Load(ModuleDirectory);
+            BuildNamedBlocks();
 
-            AddCommand("css_practice", "Open challenge practice menu", CommandPractice);
-            AddCommand("css_prac", "Open challenge practice menu", CommandPractice);
+            AddCommand("css_practice", "打开训练菜单", CommandPractice);
+            AddCommand("css_prac", "打开训练菜单", CommandPractice);
+            AddCommand("css_zep", "控制训练命令块 (enable/disable/trigger <targetname>)", CommandZep);
 
             RegisterEventHandler<EventRoundStart>(OnRoundStart);
             RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
+        }
+
+        private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
+        {
+            _isPracticeActive = false;
+            TimerManager.CancelAll();
+            _triggerableBlocks.Clear();
+            CancelAllRepeatTimers();
+            return HookResult.Continue;
+        }
+
+        private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
+        {
+            _isPracticeActive = false;
+            TimerManager.CancelAll();
+            _triggerableBlocks.Clear();
+            CancelAllRepeatTimers();
+            return HookResult.Continue;
+        }
+
+        private void CancelAllRepeatTimers()
+        {
+            foreach (var timer in _repeatTimers.Values)
+            {
+                timer.Kill();
+            }
+            _repeatTimers.Clear();
+        }
+
+        private void BuildNamedBlocks()
+        {
+            _namedBlocks.Clear();
+            _triggerableBlocks.Clear();
+            _repeatTimers.Clear();
+
+            foreach (var kv in _configManager.Config)
+            {
+                foreach (var challenge in kv.Value)
+                {
+                    CollectNamedBlocks(challenge.Blocks);
+                }
+            }
+        }
+
+        private void CollectNamedBlocks(List<BlockBase> blocks)
+        {
+            foreach (var block in blocks)
+            {
+                if (!string.IsNullOrEmpty(block.Targetname))
+                {
+                    _namedBlocks[block.Targetname] = block;
+
+                    // 将随机块加入可触发列表
+                    if (block is RandomBlock)
+                    {
+                        _triggerableBlocks[block.Targetname] = block;
+                    }
+                }
+                // 当前设计无嵌套块，无需递归
+            }
+        }
+
+        private void CommandZep(CCSPlayerController? player, CommandInfo command)
+        {
+            // 移除 player == null 的检查，让控制台也能执行命令
+            if (command.ArgCount < 3)
+            {
+                string message = "用法: !zep enable/disable/trigger <targetname>";
+                if (player != null && player.IsValid)
+                {
+                    player.PrintToChat(message);
+                }
+                else
+                {
+                    Console.WriteLine(message);
+                }
+                return;
+            }
+
+            string action = command.ArgByIndex(1).ToLower();
+            string target = command.ArgByIndex(2);
+
+            if (!_namedBlocks.TryGetValue(target, out var block))
+            {
+                string message = $"未找到名为 {target} 的命令块";
+                if (player != null && player.IsValid)
+                {
+                    player.PrintToChat(message);
+                }
+                else
+                {
+                    Console.WriteLine(message);
+                }
+                return;
+            }
+
+            if (action == "enable")
+            {
+                block.Enabled = true;
+                // 如果是重复块，在启用时启动定时器
+                if (block is RepeatBlock repeatBlock)
+                {
+                    if (!_repeatTimers.ContainsKey(target) || IsTimerKilled(_repeatTimers[target]))
+                    {
+                        StartRepeatTimer(target, repeatBlock);
+                        string message = $"已启用并启动重复块: {target}";
+                        if (player != null && player.IsValid)
+                        {
+                            player.PrintToChat(message);
+                        }
+                        else
+                        {
+                            Console.WriteLine(message);
+                        }
+                    }
+                    else
+                    {
+                        string message = $"重复块 {target} 已经在运行中";
+                        if (player != null && player.IsValid)
+                        {
+                            player.PrintToChat(message);
+                        }
+                        else
+                        {
+                            Console.WriteLine(message);
+                        }
+                    }
+                }
+                else
+                {
+                    string message = $"已启用命令块: {target}";
+                    if (player != null && player.IsValid)
+                    {
+                        player.PrintToChat(message);
+                    }
+                    else
+                    {
+                        Console.WriteLine(message);
+                    }
+                }
+            }
+            else if (action == "disable")
+            {
+                block.Enabled = false;
+                // 如果是重复块，在禁用时停止定时器
+                if (block is RepeatBlock && _repeatTimers.ContainsKey(target))
+                {
+                    var timer = _repeatTimers[target];
+                    if (!IsTimerKilled(timer))
+                    {
+                        timer.Kill();
+                    }
+                    _repeatTimers.Remove(target);
+                    string message = $"已禁用并停止重复块: {target}";
+                    if (player != null && player.IsValid)
+                    {
+                        player.PrintToChat(message);
+                    }
+                    else
+                    {
+                        Console.WriteLine(message);
+                    }
+                }
+                else
+                {
+                    string message = $"已禁用命令块: {target}";
+                    if (player != null && player.IsValid)
+                    {
+                        player.PrintToChat(message);
+                    }
+                    else
+                    {
+                        Console.WriteLine(message);
+                    }
+                }
+            }
+            else if (action == "trigger")
+            {
+                // 检查是否为可触发的块
+                if (_triggerableBlocks.ContainsKey(target))
+                {
+                    if (block.Enabled) // 只有启用状态的块才能被触发
+                    {
+                        TriggerBlock(block);
+                        string message = $"已触发命令块: {target}";
+                        if (player != null && player.IsValid)
+                        {
+                            player.PrintToChat(message);
+                        }
+                        else
+                        {
+                            Console.WriteLine(message);
+                        }
+                    }
+                    else
+                    {
+                        string message = $"命令块 {target} 当前处于禁用状态，无法触发";
+                        if (player != null && player.IsValid)
+                        {
+                            player.PrintToChat(message);
+                        }
+                        else
+                        {
+                            Console.WriteLine(message);
+                        }
+                    }
+                }
+                else
+                {
+                    string message = $"命令块 {target} 不支持触发操作";
+                    if (player != null && player.IsValid)
+                    {
+                        player.PrintToChat(message);
+                    }
+                    else
+                    {
+                        Console.WriteLine(message);
+                    }
+                }
+            }
+            else
+            {
+                string message = "动作必须是 enable、disable 或 trigger";
+                if (player != null && player.IsValid)
+                {
+                    player.PrintToChat(message);
+                }
+                else
+                {
+                    Console.WriteLine(message);
+                }
+            }
+        }
+
+        // 检查定时器是否已经被终止
+        private bool IsTimerKilled(CounterStrikeSharp.API.Modules.Timers.Timer timer)
+        {
+            // 在CounterStrike Sharp中，我们可以简单地检查timer是否为null
+            // 但实际上timer对象存在时，我们通过其他方式来跟踪其状态
+            // 这里我们假设如果定时器被Kill()后，它会变为无效状态
+            return timer == null;
+        }
+
+        private void StartRepeatTimer(string targetName, RepeatBlock repeatBlock)
+        {
+            if (!_namedBlocks.ContainsKey(targetName) || !(_namedBlocks[targetName] is RepeatBlock block))
+            {
+                return;
+            }
+
+            // 使用一个包装类来持有计数器，以便在lambda表达式中使用
+            var executionState = new ExecutionState { Count = 0 };
+
+            // 创建递归函数来处理重复执行
+            Action executeAndSchedule = null;
+            executeAndSchedule = () =>
+            {
+                // 再次检查块是否仍然启用
+                if (!block.Enabled || !(_namedBlocks.ContainsKey(targetName) && _namedBlocks[targetName] is RepeatBlock activeBlock && activeBlock.Enabled))
+                {
+                    // 如果块已被禁用，停止定时器
+                    if (_repeatTimers.ContainsKey(targetName) && !IsTimerKilled(_repeatTimers[targetName]))
+                    {
+                        _repeatTimers[targetName].Kill();
+                        _repeatTimers.Remove(targetName);
+                    }
+                    return;
+                }
+
+                ExecuteCommands(block.Commands, 0);
+                executionState.Count++;
+
+                if (block.Count.HasValue && block.Count.Value >= 0 && executionState.Count >= block.Count.Value)
+                {
+                    // 达到执行次数，移除定时器
+                    if (_repeatTimers.ContainsKey(targetName) && !IsTimerKilled(_repeatTimers[targetName]))
+                    {
+                        _repeatTimers[targetName].Kill();
+                        _repeatTimers.Remove(targetName);
+                    }
+                    return;
+                }
+
+                // 继续调度下一次执行
+                var newTimer = AddTimer(block.Interval, executeAndSchedule, TimerFlags.STOP_ON_MAPCHANGE);
+                _repeatTimers[targetName] = newTimer;
+            };
+
+            // 开始第一次执行
+            var initialTimer = AddTimer(block.Interval, executeAndSchedule, TimerFlags.STOP_ON_MAPCHANGE);
+            _repeatTimers[targetName] = initialTimer;
+        }
+
+        // 简单的类来保存执行状态
+        private class ExecutionState
+        {
+            public int Count { get; set; }
+        }
+
+        // 触发特定块的逻辑
+        private void TriggerBlock(BlockBase block)
+        {
+            if (block is RandomBlock randomBlock)
+            {
+                ExecuteRandomBlock(randomBlock, 0f);
+            }
+            // 可以扩展其他类型的块的触发逻辑
+        }
+
+        private void ExecuteRandomBlock(RandomBlock randomBlock, float baseDelay)
+        {
+            if (randomBlock.Commands.Count == 0) return;
+
+            string selectedCmd;
+            if (randomBlock.Mode.ToLower() == "pickrandomshuffle")
+            {
+                if (randomBlock.ShuffleQueue == null || randomBlock.ShuffleQueue.Count == 0)
+                {
+                    var shuffled = randomBlock.Commands.OrderBy(x => Guid.NewGuid()).ToList();
+                    randomBlock.ShuffleQueue = new Queue<string>(shuffled);
+                }
+                selectedCmd = randomBlock.ShuffleQueue.Dequeue();
+            }
+            else
+            {
+                int idx = new Random().Next(randomBlock.Commands.Count);
+                selectedCmd = randomBlock.Commands[idx];
+            }
+
+            var (delay, actualCmd) = ParseCommandString(selectedCmd);
+            float totalDelay = baseDelay + delay;
+
+            if (totalDelay > 0)
+            {
+                var timer = AddTimer(totalDelay, () => Server.ExecuteCommand(actualCmd), TimerFlags.STOP_ON_MAPCHANGE);
+                TimerManager.AddTimer(timer);
+            }
+            else
+            {
+                Server.ExecuteCommand(actualCmd);
+            }
         }
 
         private void CommandPractice(CCSPlayerController? player, CommandInfo command)
@@ -34,18 +384,18 @@ namespace ZombieEscapePractice
 
             if (_isPracticeActive)
             {
-                player.PrintToChat(Localizer.ForPlayer(player, "practice.active"));
+                player.PrintToChat(" [训练] 当前已有激活的训练，请等待回合结束。");
                 return;
             }
 
             string mapKey = GetCurrentMapKey();
-            if (!_configManager.Config.Maps.TryGetValue(mapKey, out var mapConfig) || mapConfig.Challenges.Count == 0)
+            if (!_configManager.Config.TryGetValue(mapKey, out var challenges) || challenges.Count == 0)
             {
-                player.PrintToChat(Localizer.ForPlayer(player, "practice.no_challenges", mapKey));
+                player.PrintToChat($" [训练] 当前地图 ({mapKey}) 没有配置可用的训练。");
                 return;
             }
 
-            ShowChallengeMenu(player, mapConfig.Challenges);
+            ShowChallengeMenu(player, challenges);
         }
 
         private string GetCurrentMapKey()
@@ -60,7 +410,7 @@ namespace ZombieEscapePractice
 
         private void ShowChallengeMenu(CCSPlayerController player, List<ChallengeConfig> challenges)
         {
-            var menu = new ChatMenu(Localizer.ForPlayer(player, "menu.title"));
+            var menu = new ChatMenu("选择训练节点");
             foreach (var challenge in challenges)
             {
                 menu.AddMenuOption(challenge.Name, (p, option) =>
@@ -73,86 +423,128 @@ namespace ZombieEscapePractice
 
         private void ExecuteChallenge(ChallengeConfig challenge)
         {
-            if (!string.IsNullOrEmpty(challenge.Command))
-            {
-                // 按分号分割多条命令
-                var commands = challenge.Command.Split(';', StringSplitOptions.RemoveEmptyEntries);
-                foreach (var cmd in commands)
-                {
-                    string trimmedCmd = cmd.Trim();
-                    if (string.IsNullOrEmpty(trimmedCmd)) continue;
+            ExecuteBlocks(challenge.Blocks, 0f);
 
-                    // 检查是否有延迟标记 [delay=秒数]
-                    float delay = 0f;
-                    string actualCommand = trimmedCmd;
-
-                    if (trimmedCmd.StartsWith("[delay="))
-                    {
-                        int endIndex = trimmedCmd.IndexOf(']');
-                        if (endIndex > 0)
-                        {
-                            string delayStr = trimmedCmd.Substring(7, endIndex - 7); // 提取 delay 数值部分
-                            if (float.TryParse(delayStr, out delay))
-                            {
-                                // 提取实际命令（] 后面的部分，去除空格）
-                                actualCommand = trimmedCmd.Substring(endIndex + 1).Trim();
-                            }
-                        }
-                    }
-
-                    if (delay > 0)
-                    {
-                        // 延迟执行
-                        AddTimer(delay, () =>
-                        {
-                            Server.ExecuteCommand(actualCommand);
-                        }, TimerFlags.STOP_ON_MAPCHANGE); // 换图时自动停止
-                    }
-                    else
-                    {
-                        // 立即执行
-                        Server.ExecuteCommand(actualCommand);
-                    }
-                }
-            }
-
-            // 传送所有玩家到指定位置
             if (challenge.Position != null)
             {
                 Vector targetPos = new Vector(challenge.Position.X, challenge.Position.Y, challenge.Position.Z);
-                var players = Utilities.GetPlayers();
-                foreach (var player in players)
+                QAngle? targetAngles = null;
+                if (challenge.Angle != null)
                 {
-                    if (player != null && player.IsValid && player.PlayerPawn.IsValid)
+                    targetAngles = new QAngle(challenge.Angle.Pitch, challenge.Angle.Yaw, challenge.Angle.Roll);
+                    Console.WriteLine($"[训练] 传送角度: pitch={challenge.Angle.Pitch}, yaw={challenge.Angle.Yaw}, roll={challenge.Angle.Roll}");
+                }
+
+                var players = Utilities.GetPlayers();
+                foreach (var p in players)
+                {
+                    if (p != null && p.IsValid && p.PlayerPawn.IsValid)
                     {
-                        player.PlayerPawn.Value.Teleport(targetPos, player.PlayerPawn.Value.EyeAngles, new Vector(0, 0, 0));
+                        QAngle? useAngles = targetAngles ?? p.PlayerPawn.Value.EyeAngles;
+                        p.PlayerPawn.Value.Teleport(targetPos, useAngles, new Vector(0, 0, 0));
                     }
                 }
             }
 
             _isPracticeActive = true;
 
-            // 为每个玩家发送本地化提示
             var allPlayers = Utilities.GetPlayers();
             foreach (var player in allPlayers)
             {
                 if (player != null && player.IsValid)
                 {
-                    player.PrintToChat(Localizer.ForPlayer(player, "practice.activated", challenge.Name));
+                    player.PrintToChat($" [训练] 已激活训练: {challenge.Name}，正在进行中...");
                 }
             }
         }
 
-        private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
+        private (float delay, string command) ParseCommandString(string cmd)
         {
-            _isPracticeActive = false;
-            return HookResult.Continue;
+            string trimmed = cmd.Trim();
+            if (trimmed.StartsWith("[delay="))
+            {
+                int endIdx = trimmed.IndexOf(']');
+                if (endIdx > 0)
+                {
+                    string delayStr = trimmed.Substring(7, endIdx - 7);
+                    if (float.TryParse(delayStr, out float delay))
+                        return (delay, trimmed.Substring(endIdx + 1).Trim());
+                }
+            }
+            return (0f, trimmed);
         }
 
-        private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
+        private void ExecuteBlocks(List<BlockBase> blocks, float baseDelay)
         {
-            _isPracticeActive = false;
-            return HookResult.Continue;
+            foreach (var block in blocks)
+            {
+                if (!block.Enabled) continue;
+
+                if (block is OnceBlock once)
+                {
+                    foreach (var cmd in once.Commands)
+                    {
+                        var (delay, actualCmd) = ParseCommandString(cmd);
+                        float totalDelay = baseDelay + delay;
+                        if (totalDelay > 0)
+                        {
+                            var timer = AddTimer(totalDelay, () => Server.ExecuteCommand(actualCmd), TimerFlags.STOP_ON_MAPCHANGE);
+                            TimerManager.AddTimer(timer);
+                        }
+                        else
+                        {
+                            Server.ExecuteCommand(actualCmd);
+                        }
+                    }
+                }
+                else if (block is RepeatBlock repeat)
+                {
+                    if (!string.IsNullOrEmpty(repeat.Targetname))
+                    {
+                        // 如果不是禁用开始，则立即启动定时器
+                        if (!repeat.StartDisabled)
+                        {
+                            StartRepeatTimer(repeat.Targetname, repeat);
+                        }
+                    }
+                }
+                else if (block is RandomBlock random)
+                {
+                    // 初始化随机块时将其加入可触发列表
+                    if (!string.IsNullOrEmpty(random.Targetname))
+                    {
+                        _triggerableBlocks[random.Targetname] = random;
+                    }
+
+                    // 如果不是禁用开始，则启用它
+                    if (!random.StartDisabled)
+                    {
+                        random.Enabled = true;
+                    }
+                }
+                else if (block is DelayBlock delayBlock)
+                {
+                    ExecuteCommands(delayBlock.Commands, baseDelay + delayBlock.Interval);
+                }
+            }
+        }
+
+        private void ExecuteCommands(List<string> commands, float baseDelay)
+        {
+            foreach (var cmd in commands)
+            {
+                var (delay, actualCmd) = ParseCommandString(cmd);
+                float totalDelay = baseDelay + delay;
+                if (totalDelay > 0)
+                {
+                    var timer = AddTimer(totalDelay, () => Server.ExecuteCommand(actualCmd), TimerFlags.STOP_ON_MAPCHANGE);
+                    TimerManager.AddTimer(timer);
+                }
+                else
+                {
+                    Server.ExecuteCommand(actualCmd);
+                }
+            }
         }
     }
 }
