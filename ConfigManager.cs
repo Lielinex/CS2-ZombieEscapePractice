@@ -30,23 +30,23 @@ namespace ZombieEscapePractice
 
     public class ConfigManager()
     {
-        private string _configsFolderPath;
+        private string _mapsFolderPath;
         public Dictionary<string, List<ChallengeConfig>> Config { get; private set; } = new();
 
         public void Load(string moduleDirectory)
         {
-            // 构建配置文件夹路径: csgo/addons/counterstrikesharp/configs/plugins/ZombieEscapePractice
-            var basePath = Path.GetFullPath(Path.Combine(moduleDirectory, "..", "..", "configs", "plugins", "ZombieEscapePractice"));
-            _configsFolderPath = basePath;
+            // 构建地图配置文件夹路径: configs/plugins/ZombieEscapePractice/maps
+            var basePath = Path.GetFullPath(Path.Combine(moduleDirectory, "..", "..", "configs", "plugins", "ZombieEscapePractice", "maps"));
+            _mapsFolderPath = basePath;
 
-            if (!Directory.Exists(_configsFolderPath))
-                Directory.CreateDirectory(_configsFolderPath);
+            if (!Directory.Exists(_mapsFolderPath))
+                Directory.CreateDirectory(_mapsFolderPath);
 
-            var files = Directory.GetFiles(_configsFolderPath, "*.json");
+            var files = Directory.GetFiles(_mapsFolderPath, "*.json");
             if (files.Length == 0)
             {
                 CreateDefaultExample();
-                files = Directory.GetFiles(_configsFolderPath, "*.json");
+                files = Directory.GetFiles(_mapsFolderPath, "*.json");
             }
 
             foreach (var file in files)
@@ -54,13 +54,11 @@ namespace ZombieEscapePractice
                 try
                 {
                     string json = File.ReadAllText(file);
-                    // 反序列化为字典，键为地图标识符，值为挑战列表
                     var fileConfig = JsonSerializer.Deserialize<Dictionary<string, List<ChallengeConfig>>>(json);
                     if (fileConfig != null)
                     {
                         foreach (var kv in fileConfig)
                         {
-                            // 如果键已存在，覆盖
                             Config[kv.Key] = kv.Value;
                             Console.WriteLine($"[ZombieEscapePractice] 已加载地图配置: {kv.Key} 来自文件 {Path.GetFileName(file)}");
                         }
@@ -130,7 +128,7 @@ namespace ZombieEscapePractice
                 }
             };
             string json = JsonSerializer.Serialize(example, new JsonSerializerOptions { WriteIndented = true });
-            string examplePath = Path.Combine(_configsFolderPath, "example.json");
+            string examplePath = Path.Combine(_mapsFolderPath, "example.json");
             File.WriteAllText(examplePath, json);
         }
     }
