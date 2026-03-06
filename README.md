@@ -6,8 +6,8 @@
 
 - **快速跳转**：一键传送所有玩家到配置好的位置，并可设置视角朝向。
 - **灵活配置**：每个地图可配置多个训练节点，支持自定义触发命令，支持混合延时、重复、随机执行。
-- **动态命令块**：可为命令块指定 `targetname`，通过 `!zep` 命令动态启用/禁用/触发（如随机块）。
-- **投票功能**：内置全景投票系统，支持 `!vote_for` 和 `!vote_execute`（执行命令投票）。
+- **动态命令块**：可为命令块指定 `targetname`，通过 `!zep` 命令动态启用/禁用/触发。
+- **投票功能**：内置投票系统，支持 `!vote_for` 和 `!vote_execute`。
 - **功能开关**：可通过插件配置文件 `ZEPconfig.json` 单独启用/关闭练习、投票、调试功能。
 - **地图识别**：优先使用创意工坊地图 ID 作为配置键，兼容完整地图名。
 
@@ -133,7 +133,7 @@ csgo/addons/counterstrikesharp/
 
 ## ⚠️ 注意事项
 
-服务器和客户端都需要有对应的resource/platform_<language>本地化文件支持投票界面显示（简体中文为 resource/platform_schinese.txt）。可以自行上传创意工坊，也可以通过创意工坊订阅我的资源包 [CASZE Practice Server Resources](https://steamcommunity.com/sharedfiles/filedetails/?id=3678363447) 来获取。
+服务器和客户端都需要有对应的resource/platform_<language>本地化文件支持投票界面显示（简体中文为platform_schinese.txt，放置于game/csgo/resource文件夹中）。可以自行上传创意工坊，也可以通过创意工坊订阅我的资源包 [CASZE Practice Server Resources](https://steamcommunity.com/sharedfiles/filedetails/?id=3678363447) 来获取。
 
 坐标获取：游戏内开启控制台输入 cl_showpos 1 可查看当前位置。
 
