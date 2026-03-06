@@ -1,158 +1,73 @@
-using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Translations;
-using CounterStrikeSharp.API.Modules.Commands;
-using CounterStrikeSharp.API.Modules.Cvars;
-using CounterStrikeSharp.API.Modules.Menu;
-using CounterStrikeSharp.API.Modules.Utils;
-using CounterStrikeSharp.API.Modules.Timers;
 
 namespace ZombieEscapePractice
 {
     public class ChallengePlugin : BasePlugin
     {
-        public override string ModuleName => "Zombie Escape Practice";
-        public override string ModuleVersion => "1.3.0";
+        public override string ModuleName => "ZombieEscapePractice";
+        public override string ModuleDescription => "僵尸逃跑弹幕图练习插件";
+        public override string ModuleAuthor => "Lielinex";
+        public override string ModuleVersion => "1.0.0";
 
-        private ConfigManager _configManager = new();
-        private bool _isPracticeActive = false;
+        private PluginConfig _pluginConfig;
+        private ConfigManager _configManager;
+        private BlockManager _blockManager;
+        private PracticeManager? _practiceManager;
+        private VoteManager? _voteManager;
 
         public override void Load(bool hotReload)
         {
+            Console.WriteLine("[ZombieEscapePractice] 正在加载...");
+            string configPath = Path.Combine(ModuleDirectory, "..", "..", "configs", "plugins", "ZombieEscapePractice", "ZEPconfig.json");
+            _pluginConfig = PluginConfig.Load(configPath);
+            Console.WriteLine($"[ZombieEscapePractice] 配置加载完成: Practice={_pluginConfig.EnablePractice}, Vote={_pluginConfig.EnableVote}, Debug={_pluginConfig.EnableDebug}");
+
+            _configManager = new ConfigManager();
             _configManager.Load(ModuleDirectory);
 
-            AddCommand("css_practice", "Open challenge practice menu", CommandPractice);
-            AddCommand("css_prac", "Open challenge practice menu", CommandPractice);
+            _blockManager = new BlockManager(this, _configManager, _pluginConfig);
+            AddCommand("css_zep", "控制训练命令块 (enable/disable/trigger <targetname>)", (player, info) => _blockManager.CommandZep(player, info));
+
+            if (_pluginConfig.EnablePractice)
+            {
+                _practiceManager = new PracticeManager(this, _configManager);
+                AddCommand("css_practice", "打开训练菜单", (player, info) => _practiceManager.CommandPractice(player, info));
+                AddCommand("css_prac", "打开训练菜单", (player, info) => _practiceManager.CommandPractice(player, info));
+            }
+
+            if (_pluginConfig.EnableVote)
+            {
+                _voteManager = new VoteManager(this);
+                AddCommand("css_vote_for", "发起一个投票，格式: !vote_for <内容>", (player, info) => _voteManager.CommandVoteFor(player, info));
+                AddCommand("css_vote_execute", "发起一个执行命令的投票，格式: !vote_execute \"命令\" [说明]", (player, info) => _voteManager.CommandVoteExecute(player, info));
+            }
 
             RegisterEventHandler<EventRoundStart>(OnRoundStart);
             RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
-        }
 
-        private void CommandPractice(CCSPlayerController? player, CommandInfo command)
-        {
-            if (player == null || !player.IsValid) return;
-
-            if (_isPracticeActive)
-            {
-                player.PrintToChat(Localizer.ForPlayer(player, "practice.active"));
-                return;
-            }
-
-            string mapKey = GetCurrentMapKey();
-            if (!_configManager.Config.Maps.TryGetValue(mapKey, out var mapConfig) || mapConfig.Challenges.Count == 0)
-            {
-                player.PrintToChat(Localizer.ForPlayer(player, "practice.no_challenges", mapKey));
-                return;
-            }
-
-            ShowChallengeMenu(player, mapConfig.Challenges);
-        }
-
-        private string GetCurrentMapKey()
-        {
-            var convar = ConVar.Find("host_workshop_map");
-            if (convar != null && !string.IsNullOrEmpty(convar.StringValue))
-            {
-                return convar.StringValue;
-            }
-            return Server.MapName;
-        }
-
-        private void ShowChallengeMenu(CCSPlayerController player, List<ChallengeConfig> challenges)
-        {
-            var menu = new ChatMenu(Localizer.ForPlayer(player, "menu.title"));
-            foreach (var challenge in challenges)
-            {
-                menu.AddMenuOption(challenge.Name, (p, option) =>
-                {
-                    ExecuteChallenge(challenge);
-                });
-            }
-            MenuManager.OpenChatMenu(player, menu);
-        }
-
-        private void ExecuteChallenge(ChallengeConfig challenge)
-        {
-            if (!string.IsNullOrEmpty(challenge.Command))
-            {
-                // 按分号分割多条命令
-                var commands = challenge.Command.Split(';', StringSplitOptions.RemoveEmptyEntries);
-                foreach (var cmd in commands)
-                {
-                    string trimmedCmd = cmd.Trim();
-                    if (string.IsNullOrEmpty(trimmedCmd)) continue;
-
-                    // 检查是否有延迟标记 [delay=秒数]
-                    float delay = 0f;
-                    string actualCommand = trimmedCmd;
-
-                    if (trimmedCmd.StartsWith("[delay="))
-                    {
-                        int endIndex = trimmedCmd.IndexOf(']');
-                        if (endIndex > 0)
-                        {
-                            string delayStr = trimmedCmd.Substring(7, endIndex - 7); // 提取 delay 数值部分
-                            if (float.TryParse(delayStr, out delay))
-                            {
-                                // 提取实际命令（] 后面的部分，去除空格）
-                                actualCommand = trimmedCmd.Substring(endIndex + 1).Trim();
-                            }
-                        }
-                    }
-
-                    if (delay > 0)
-                    {
-                        // 延迟执行
-                        AddTimer(delay, () =>
-                        {
-                            Server.ExecuteCommand(actualCommand);
-                        }, TimerFlags.STOP_ON_MAPCHANGE); // 换图时自动停止
-                    }
-                    else
-                    {
-                        // 立即执行
-                        Server.ExecuteCommand(actualCommand);
-                    }
-                }
-            }
-
-            // 传送所有玩家到指定位置
-            if (challenge.Position != null)
-            {
-                Vector targetPos = new Vector(challenge.Position.X, challenge.Position.Y, challenge.Position.Z);
-                var players = Utilities.GetPlayers();
-                foreach (var player in players)
-                {
-                    if (player != null && player.IsValid && player.PlayerPawn.IsValid)
-                    {
-                        player.PlayerPawn.Value.Teleport(targetPos, player.PlayerPawn.Value.EyeAngles, new Vector(0, 0, 0));
-                    }
-                }
-            }
-
-            _isPracticeActive = true;
-
-            // 为每个玩家发送本地化提示
-            var allPlayers = Utilities.GetPlayers();
-            foreach (var player in allPlayers)
-            {
-                if (player != null && player.IsValid)
-                {
-                    player.PrintToChat(Localizer.ForPlayer(player, "practice.activated", challenge.Name));
-                }
-            }
+            Console.WriteLine("[ZombieEscapePractice] 加载完成！");
         }
 
         private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
         {
-            _isPracticeActive = false;
+            _blockManager?.OnRoundStart();
+            _practiceManager?.OnRoundStart();
+            TimerManager.CancelAll();
             return HookResult.Continue;
         }
 
         private HookResult OnRoundEnd(EventRoundEnd @event, GameEventInfo info)
         {
-            _isPracticeActive = false;
+            _blockManager?.OnRoundEnd();
+            _practiceManager?.OnRoundEnd();
+            TimerManager.CancelAll();
             return HookResult.Continue;
+        }
+
+        public override void Unload(bool hotReload)
+        {
+            TimerManager.CancelAll();
+            base.Unload(hotReload);
         }
     }
 }

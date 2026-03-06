@@ -1,0 +1,64 @@
+{
+  "ze_re_creation": [
+    {
+      "name": "第一关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Button_Stage1 Press",
+            "css_vote_execute 'endround' 更换至第一关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第二关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Stage2_Button_laser Press",
+            "css_vote_execute 'endround' 更换至第二关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RTV1",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Button_StageRTV1 Press",
+            "css_vote_execute 'endround' 更换至RTV1关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RTV2",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Button_StageRTV2 Press",
+            "css_vote_execute 'endround' 更换至RTV2关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RTV3",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Button_StageRTV3 Press",
+            "css_vote_execute 'endround' 更换至RTV3关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    }
+  ]
+}

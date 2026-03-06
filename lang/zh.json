@@ -1,6 +1,0 @@
-{
-    "practice.active": " [训练] 当前已有激活的训练，请等待回合结束。",
-    "practice.no_challenges": " [训练] 当前地图 ({0}) 没有配置可用的训练。",
-    "menu.title": "选择训练节点",
-    "practice.activated": " [训练] 已激活训练: {0}，正在进行中..."
-}

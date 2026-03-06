@@ -1,0 +1,143 @@
+{
+  "ze_hydroponic_garden": [
+    {
+      "name": "第一关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire admin_stage1 Press",
+            "css_vote_execute 'endround' 更换至第一关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第一关 推推乐",
+      "blocks": [
+        {
+          "type": "once",
+          "position": {"x": 13458.575195, "y": -12096.347656, "z": -4756.080078},
+          "angle": {"pitch":0.000000 ,"yaw": 180.000000 ,"roll": 0.000000},
+          "commands": [
+            "say | 10 |",
+            "[delay=5]say | 5 |",
+            "[delay=10]c_entfire stage1_slime_end Alpha 20",
+            "[delay=10]c_entfire stage1_toggle_end Toggle",
+            "[delay=10]c_entfire s1_tp_zmcage Enable",
+            "[delay=13]c_entfire s1_dodge_maker ForceSpawn",
+            "[delay=37]c_entfire s1_once_win Enable"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第二关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire admin_stage2 Press",
+            "css_vote_execute 'endround' 更换至第二关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第二关 几何刀",
+      "blocks": [
+        {
+          "type": "once",
+          "position": {"x": 5566.117188, "y": -5641.663574, "z": -5997.729492},
+          "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+          "commands": [
+            "[delay=3]c_entfire s2_doorend1 Open",
+            "[delay=3]c_entfire s2_doorend2 Open",
+            "c_entfire s2_beam_case PickRandom",
+            "[delay=5]say | 20 |",
+            "[delay=10]say | 15 |",
+            "[delay=15]say | 10 |",
+            "[delay=20]say | 5 |",
+            "[delay=25]c_entfire s2_rotateend Open"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第三关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire admin_stage3 Press",
+            "css_vote_execute 'endround' 更换至第三关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第三关 BOSS",
+      "position": {"x": -5996.027344, "y": -11816.230469, "z": -5233.058594},
+      "angle": {"pitch":0.000000 ,"yaw": 130.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire s3_music02 PlaySound",
+            "[delay=5]c_entfire s3_music01 StopSound",
+            "[delay=5]say | 20 |",
+            "[delay=10]say | 15 |",
+            "[delay=15]say | 10 |",
+            "[delay=20]say | 5 |",
+            "[delay=25]c_entfire s3_breakable_bossroom Kill",
+            "[delay=25]c_entfire s3_roomboss_tpdisablehumans Enable",
+            "[delay=29]c_entfire s3_boss_start_relay Trigger"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第四关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire admin_stage4 Press",
+            "css_vote_execute 'endround' 更换至第四关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第四关 低重力弹幕旋转刀",
+      "position": {"x": -13789.522461, "y": -2431.012695, "z": -8493.186523},
+      "angle": {"pitch":0.000000 ,"yaw": 90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire template_s4_ending ForceSpawn",
+            "[delay=5]c_entfire s4_music01 StopSound",
+            "[delay=5]c_entfire s4_music02 StopSound",
+            "[delay=1]c_entfire s4_music03 PlaySound",
+            "[delay=5]say | 60 |",
+            "[delay=15]say | 50 |",
+            "[delay=25]say | 40 |",
+            "[delay=35]say | 30 |",
+            "[delay=45]say | 20 |",
+            "[delay=55]say | 10 |",
+            "[delay=60]say | 5 |",
+            "[delay=61]say | 4 |",
+            "[delay=62]say | 3 |",
+            "[delay=63]say | 2 |",
+            "[delay=64]say | 1 |",
+            "[delay=62]c_entfire s4_ending_correction Enable",
+            "[delay=65]c_entfire z_m_xdez_relay Trigger",
+            "[delay=65]c_entfire s4_relay_clean_map Trigger",
+            "[delay=65]c_entfire s4_end_addhp Enable"
+          ]
+        }
+      ]
+    }
+  ]
+}

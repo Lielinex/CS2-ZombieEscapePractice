@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace ZombieEscapePractice
@@ -13,106 +10,126 @@ namespace ZombieEscapePractice
         [JsonPropertyName("z")] public float Z { get; set; }
     }
 
+    public class AngleConfig
+    {
+        [JsonPropertyName("pitch")] public float Pitch { get; set; }
+        [JsonPropertyName("yaw")] public float Yaw { get; set; }
+        [JsonPropertyName("roll")] public float Roll { get; set; }
+    }
+
     public class ChallengeConfig
     {
         [JsonPropertyName("name")] public string Name { get; set; } = "";
-        [JsonPropertyName("position")] public PositionConfig? Position { get; set; } // 可空
-        [JsonPropertyName("command")] public string Command { get; set; } = "";
+        [JsonPropertyName("position")] public PositionConfig? Position { get; set; }
+        [JsonPropertyName("angle")] public AngleConfig? Angle { get; set; }
+
+        [JsonPropertyName("blocks")]
+        [JsonConverter(typeof(BlockConverter))]
+        public List<BlockBase> Blocks { get; set; } = new();
     }
 
-    public class MapConfig
+    public class ConfigManager()
     {
-        [JsonPropertyName("challenges")] public List<ChallengeConfig> Challenges { get; set; } = new();
-    }
-
-    public class PluginConfig
-    {
-        [JsonPropertyName("maps")] public Dictionary<string, MapConfig> Maps { get; set; } = new();
-    }
-
-    public class ConfigManager
-    {
-        private string _configPath;
-        public PluginConfig Config { get; private set; } = new();
+        private string _mapsFolderPath;
+        public Dictionary<string, List<ChallengeConfig>> Config { get; private set; } = new();
 
         public void Load(string moduleDirectory)
         {
-            _configPath = Path.Combine(moduleDirectory, "challenges.json");
-            if (!File.Exists(_configPath))
+            // 地图配置文件夹路径: configs/plugins/ZombieEscapePractice/maps
+            var basePath = Path.GetFullPath(Path.Combine(moduleDirectory, "..", "..", "configs", "plugins", "ZombieEscapePractice", "maps"));
+            _mapsFolderPath = basePath;
+
+            if (!Directory.Exists(_mapsFolderPath))
+                Directory.CreateDirectory(_mapsFolderPath);
+
+            var files = Directory.GetFiles(_mapsFolderPath, "*.json");
+            if (files.Length == 0)
             {
-                CreateDefaultConfig();
-                return;
+                CreateDefaultExample();
+                files = Directory.GetFiles(_mapsFolderPath, "*.json");
             }
 
-            try
+            foreach (var file in files)
             {
-                string json = File.ReadAllText(_configPath);
-                Config = JsonSerializer.Deserialize<PluginConfig>(json) ?? new PluginConfig();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[ZombieEscapePractice] 配置文件加载失败: {ex.Message}，使用默认配置。");
-                CreateDefaultConfig();
+                try
+                {
+                    string json = File.ReadAllText(file);
+                    var fileConfig = JsonSerializer.Deserialize<Dictionary<string, List<ChallengeConfig>>>(json);
+                    if (fileConfig != null)
+                    {
+                        foreach (var kv in fileConfig)
+                        {
+                            Config[kv.Key] = kv.Value;
+                            Console.WriteLine($"[ZombieEscapePractice] 已加载地图配置: {kv.Key} 来自文件 {Path.GetFileName(file)}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ZombieEscapePractice] 加载配置文件 {file} 失败: {ex.Message}");
+                }
             }
         }
 
-        private void CreateDefaultConfig()
+        private void CreateDefaultExample()
         {
-            Config = new PluginConfig();
-            // 示例1：同时有传送和命令
-            Config.Maps["123456789"] = new MapConfig
+            var example = new Dictionary<string, List<ChallengeConfig>>
             {
-                Challenges = new List<ChallengeConfig>
-        {
-            new ChallengeConfig
-            {
-                Name = "跳刀练习 - 第一阶段",
-                Position = new PositionConfig { X = -1234.5f, Y = 567.8f, Z = 900.1f },
-                Command = "ent_fire knife_spawner addoutput origin -1234.5 567.8 900.1"
-            }
-        }
+                ["example_map"] = new List<ChallengeConfig>
+                {
+                    new ChallengeConfig
+                    {
+                        Name = "example 1",
+                        Position = new PositionConfig { X = -1234.5f, Y = 567.8f, Z = 900.1f },
+                        Blocks = new List<BlockBase>
+                        {
+                            new OnceBlock
+                            {
+                                Commands = new List<string> { "ent_fire knife_spawner enable" }
+                            }
+                        }
+                    },
+                    new ChallengeConfig
+                    {
+                        Name = "example 2（delay 10 sec）",
+                        Position = null,
+                        Blocks = new List<BlockBase>
+                        {
+                            new OnceBlock
+                            {
+                                Commands = new List<string> { "[delay=10]ent_fire barrage_controller activate" }
+                            }
+                        }
+                    },
+                    new ChallengeConfig
+                    {
+                        Name = "multi blocks example",
+                        Blocks = new List<BlockBase>
+                        {
+                            new OnceBlock { Commands = new List<string> { "say command once" } },
+                            new DelayBlock
+                            {
+                                Interval = 4,
+                                Commands = new List<string> { "say command delay 4 sec" }
+                            },
+                            new RepeatBlock
+                            {
+                                Interval = 2,
+                                Count = 5,
+                                Commands = new List<string> { "say command repeat 5 times" }
+                            },
+                            new RandomBlock
+                            {
+                                Mode = "PickRandomShuffle",
+                                Commands = new List<string> { "say 'skil1'", "say 'skill2'", "say 'skill3'" }
+                            }
+                        }
+                    }
+                }
             };
-            // 示例2：只有传送（无命令）
-            Config.Maps["987654321"] = new MapConfig
-            {
-                Challenges = new List<ChallengeConfig>
-        {
-            new ChallengeConfig
-            {
-                Name = "跑路练习 - 传送点",
-                Position = new PositionConfig { X = 2000f, Y = 3000f, Z = 512f },
-                Command = "" // 明确留空，不执行命令
-            }
-        }
-            };
-            // 示例3：只有命令（无传送）
-            Config.Maps["ze_no_teleport"] = new MapConfig
-            {
-                Challenges = new List<ChallengeConfig>
-        {
-            new ChallengeConfig
-            {
-                Name = "弹幕启动 - 仅命令",
-                Position = null, // 不传送
-                Command = "ent_fire barrage_controller activate"
-            }
-        }
-            };
-            Save();
-        }
-
-        public void Save()
-        {
-            try
-            {
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(Config, options);
-                File.WriteAllText(_configPath, json);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[ZombieEscapePractice] 配置文件保存失败: {ex.Message}");
-            }
+            string json = JsonSerializer.Serialize(example, new JsonSerializerOptions { WriteIndented = true });
+            string examplePath = Path.Combine(_mapsFolderPath, "example.json");
+            File.WriteAllText(examplePath, json);
         }
     }
 }

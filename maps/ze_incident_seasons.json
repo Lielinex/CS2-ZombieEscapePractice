@@ -1,0 +1,294 @@
+{
+  "ze_incident_seasons": [
+    {
+      "name": "关卡-春",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Spring_button Press",
+            "css_vote_execute 'endround' 更换至关卡-春，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "关卡-春 Boss战",
+      "position": {"x": -13112.482422,"y": -5086.416992,"z": -7829.621582},
+      "angle": {"pitch":0.000000 ,"yaw": 180.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "[delay=8]c_entfire lvl1_boss_start_relay Trigger",
+            "c_entfire s1_place2_layer showworldlayerandspawnentities",
+            "[delay=5]c_entfire sound_s1_0 StopSound",
+            "[delay=5]c_entfire sound_s1_1 StopSound",
+            "[delay=5]c_entfire sound_s1_2 StopSound",
+            "c_entfire sound_s1_3 StartSound",
+            "say *** ？？？：是你......手下败将居然还敢来作乱 ***",
+            "[delay=12]say *** ？？？：竟敢破坏净化仪式，不可饶恕 ***",
+            "[delay=16]say *** 索尼娅：吾名索尼娅，你们都该死 ***",
+            "[delay=17]say *** 巴托莉：秩序之庭的大人们，她就交给你们了 ***"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "关卡-夏",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire summer_button Press",
+            "css_vote_execute 'endround' 更换至关卡-夏，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "关卡-夏 跳刀",
+      "position": {"x": 12349.794922,"y": -7808.652832,"z": -8018.743652},
+      "angle": {"pitch":0.000000 ,"yaw": 180.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire lvl2_a_p4 Start",
+            "c_entfire s2_place2_layer showworldlayerandspawnentities",
+            "c_entfire sky_summer0 start",
+            "c_entfire sky_summer0 alpha 255",
+            "[delay=1]c_entfire lvl2_boss_start_par",
+            "[delay=2]c_entfire lvl2_final_dynamic Alpha 255",
+            "[delay=2]c_entfire lvl2_final_push_train StartForward",
+            "[delay=5]c_entfire lvl2_final_push_train StartForward",
+            "[delay=5]c_entfire sound_s2_0 StopSound",
+            "[delay=5]c_entfire sound_s2_1 StopSound",
+            "c_entfire sound_s2_2 StartSound",
+            "say *** ？？？：这样吗？那我不介意用仪式残留的力量来消灭你们这些蝼蚁 ***",
+            "c_entfire magic Start",
+            "c_entfire lvl2_final_dynamic SetAnimationNotLooping atk2",
+            "[delay=10]c_entfire magic_rota Start",
+            "[delay=10]c_entfire magic_rota_01 Start",
+            "[delay=12]c_entfire magic_rota_02 Start",
+            "[delay=14]c_entfire magic_rota_03 Start",
+            "[delay=16]c_entfire magic_rota_04 Start",
+            "[delay=24]c_entfire magic_circle_a Start",
+            "[delay=26]c_entfire lvl2_final_move_track StartForward",
+            "[delay=33]say *** ？？？：试试这个 ***",
+            "[delay=34]c_entfire lihui_doros_par0 FireUser1",
+            "[delay=34]c_entfire lvl2_final_dynamic SetAnimationNotLooping alt",
+            "[delay=36]c_entfire lvl2_final_laser_case PickRandomShuffle",
+            "[delay=40]c_entfire lvl2_final_laser_case PickRandomShuffle",
+            "[delay=40]c_entfire lvl2_final_dynamic SetAnimationNotLooping atk2",
+            "[delay=44]c_entfire lvl2_final_dynamic SetAnimationNotLooping atk2",
+            "[delay=49]say *** ？？？：........................... ***",
+            "[delay=53]say *** ？？？：你以为我会说饶你一命吗 ***",
+            "[delay=54]c_entfire lvl2_final_dynamic SetAnimationNotLooping alt",
+            "[delay=55]say *** ？？？：给我接好了 ***",
+            "[delay=56]css_zep enable lvl2_final_laser_timer1"
+          ]
+        },
+        {
+          "targetname": "lvl2_final_laser_timer1",
+          "type": "repeat",
+          "interval": 2,
+          "count": 72,
+          "StartDisabled": true,
+          "commands": [
+            "c_entfire lvl2_final_dynamic SetAnimationNotLooping atk2",
+            "css_zep trigger lvl2_final_laser_random"
+          ]
+        },
+        {
+          "targetname": "lvl2_final_laser_timer2",
+          "type": "repeat",
+          "interval": 1,
+          "count": 20,
+          "StartDisabled": true,
+          "commands": [
+            "c_entfire lvl2_final_dynamic SetAnimationNotLooping atk2",
+            "css_zep trigger lvl2_final_laser_random"
+          ]
+        },
+        {
+          "targetname": "lvl2_final_laser_random",
+          "type": "random",
+          "mode": "PickRandom",
+          "StartDisabled": false,
+          "commands": [
+            "c_entfire lvl2_final_laser_maker1 ForceSpawn",
+            "c_entfire lvl2_final_laser_maker2 ForceSpawn"
+          ]
+        },
+        {
+          "type": "once",
+          "commands": [
+            "[delay=200]css_zep disable lvl2_final_laser_timer1",
+            "[delay=200]css_zep enable lvl2_final_laser_timer2",
+            "[delay=220]css_zep disable lvl2_final_laser_timer2",
+            "[delay=220]c_entfire lvl2_final_fake_maker ForceSpawn",
+            "[delay=222]c_entfire lvl2_final_fake_laser Open",
+            "[delay=227]c_entfire lvl2_final_fake_laser_p Stop",
+            "[delay=227]c_entfire lvl2_final_fake_laser Kill",
+            "[delay=227]c_entfire fade_white_quick Fade",
+            "[delay=228]c_entfire lvl2_final_text Display",
+            "[delay=228]say *** ？？？：你过关！ ***",
+            "[delay=230]c_entfire lvl2_final_fake_laser Kill",
+            "[delay=230]c_entfire magic* Stop",
+            "[delay=230]say *** ？？？：这里已经安全了，如果你们还要生事，就别怪我无情 ***",
+            "[delay=232]c_entfire lvl2_final_text2 Display",
+            "[delay=234]c_entfire lvl2_win_trigger Enable"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "关卡-秋",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire autumn_button Press",
+            "css_vote_execute 'endround' 更换至关卡-秋，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "关卡-秋 Boss战",
+      "position": {"x":  13156.500977,"y": -14284.712891,"z": -14153.140625},
+      "angle": {"Pitch":0.000000 ,"Yaw": 0.000000 ,"Roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire s3_place3_layer showworldlayerandspawnentities",
+            "[delay=5]c_entfire sound_s3_0 StopSound",
+            "[delay=5]c_entfire sound_s3_1 StopSound",
+            "[delay=5]c_entfire sound_s3_2 StopSound",
+            "c_entfire sky_autumn1 alpha 0",
+            "[delay=2]c_entfire lvl3_boss_start_relay Trigger"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "关卡-秋 逃亡路列车刀",
+      "position": {"x": 13187.588867,"y": 6269.327148,"z": 8858.123047},
+      "angle": {"Pitch":0.000000 ,"Yaw": 180.000000 ,"Roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire s3_place4_layer showworldlayerandspawnentities",
+            "[delay=5]c_entfire sound_s3_0 StopSound",
+            "[delay=5]c_entfire sound_s3_1 StopSound",
+            "[delay=5]c_entfire sound_s3_2 StopSound",
+            "[delay=5]c_entfire sound_s3_3 StopSound",
+            "c_entfire sky_autumn1 alpha 0",
+            "c_entfire sound_s3_4 StartSound",
+            "c_entfire lvl3_final_dynamic_par Start",
+            "c_entfire lvl3_final_door* Kill",
+            "[delay=4]c_entfire lvl3_a_p4 Start",
+            "[delay=4]c_entfire fade_white_quick Fade",
+            "[delay=4]say *** 索尼娅：等下！ ***",
+            "[delay=4]c_entfire lvl3_final_dynamic FireUser2",
+            "[delay=5]say *** 索尼娅：你们不能离开 ***",
+            "[delay=5]c_entfire lvl3_final_dynamic_move Open",
+            "[delay=5]c_entfire lvl3_final_dynamic SetAnimationNoResetLooping walk",
+            "[delay=6]say *** 索尼娅：留下季节的力量！ ***",
+            "[delay=7]say *** 巴托莉：她已经疯了，什么都做的出来，当务之急是离开 ***",
+            "[delay=7]say *** 巴托莉：走！前面就是传送门，我们准备撤 ***",
+            "[delay=8]say *** 索尼娅：决不能放你们走...... ***",
+            "[delay=8]c_entfire lvl3_final_laser_2_timer Enable",
+            "[delay=10]c_entfire lvl3_final_laser_1_timer Enable",
+            "[delay=119]c_entfire lvl3_final_laser_1_timer Disable",
+            "[delay=119]c_entfire lvl3_final_laser_2_timer Disable",
+            "[delay=119]c_entfire lvl3_final_dynamic SetAnimationNoResetNotLooping dead",
+            "[delay=119]c_entfire lvl3_final_dynamic SetIdleAnimationNotLooping",
+            "[delay=6]say *** 索尼娅：不！！！！！ ***",
+            "[delay=119]c_entfire lvl3_end_noob_push Kill",
+            "[delay=119]c_entfire lvl3_final_water_push Kill",
+            "[delay=121]c_entfire lvl3_final_dynamic FireUser1",
+            "[delay=129]c_entfire lvl3_win_tele Enable"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "关卡-冬",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire winter_button Press",
+            "css_vote_execute 'endround' 更换至关卡-冬，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "关卡-冬 Boss战",
+      "position": {"x":13327.290039,"y": -2234.169922,"z": 7943.370117},
+      "angle": {"Pitch":0.000000 ,"Yaw": 0.000000 ,"Roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire s4_place2_layer showworldlayerandspawnentities",
+            "c_entfire lvl4_crystal_tem ForceSpawn",
+            "[delay=5]c_entfire sound_s4_0 StopSound",
+            "[delay=5]c_entfire sound_s4_1 StopSound",
+            "[delay=5]c_entfire sound_s4_2 StopSound",
+            "[delay=1]c_entfire lvl4_crystal_hp SetValue 0"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "关卡-冬 Final",
+      "position": {"x":13327.290039,"y": -2234.169922,"z": 7943.370117},
+      "angle": {"Pitch":0.000000 ,"Yaw": 0.000000 ,"Roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire s4_place2_layer showworldlayerandspawnentities",
+            "[delay=5]c_entfire sound_s4_0 StopSound",
+            "[delay=5]c_entfire sound_s4_1 StopSound",
+            "[delay=5]c_entfire sound_s4_2 StopSound",
+            "[delay=5]c_entfire sound_s4_2_2 StopSound",
+            "c_entfire lvl4_crystal_hurt Kill",
+            "c_entfire lvl4_crystal_mdl Kill",
+            "c_entfire s4_boss_die_relay trigger",
+            "c_entfire s4_end0_bathory0 alpha 255",
+            "c_entfire s4_end0_bathory0_par2 start",
+            "[delay=17]c_entfire s4_end0_bathory0_par0 start",
+            "[delay=32]c_entfire s4_end0_bathory0_par1 start",
+            "[delay=15]c_entfire s4_end0_bathory0 SetAnimationNotLooping standup",
+            "[delay=16]c_entfire s4_end0_bathory0_m0 open",
+            "c_entfire s4_win_tele enable",
+            "[delay=4]c_entfire s4_end0_temp0 forcespawn",
+            "[delay=5]c_entfire script RunScriptInput s4_end_start",
+            "[delay=6]c_entfire s4_zm_case0 kill",
+            "[delay=6]c_entfire s4_zm_tele addoutput OnHurtPlayer>!activator>keyvalue>origin 13936 -2160 7936>0>0",
+            "[delay=7]c_entfire s4_zm_tele enable"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "关卡-RTV",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire rtv_button Press",
+            "css_vote_execute 'endround' 更换至关卡-RTV，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    }
+  ]
+}

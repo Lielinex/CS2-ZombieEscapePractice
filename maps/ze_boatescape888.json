@@ -1,0 +1,455 @@
+{
+  "ze_boatescape888": [
+    {
+      "name": "EX(极难模式)-除连关外所有练习都需先开此模式",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Map_Counter Enable",
+            "c_entfire Map_Counter SetValue 2",
+            "say '**EX Mode**'",
+            "css_vote_execute 'endround' 更换至EX，结束当前回合以立即生效？",
+            "say '注意！该模式在下回合及之后的所有回合生效'"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "The Haven Legend(6连)",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Map_Counter Enable",
+            "c_entfire Map_Counter SetValue 6",
+            "say '**The Heavens Legend**'",
+            "css_vote_execute 'endround' 更换至The Haven Legend(6连)，结束当前回合以立即生效？",
+            "say '注意！该模式仅在下回合生效'"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "The Perfect Legend(9连)",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Map_Counter Enable",
+            "c_entfire Map_Counter SetValue 7",
+            "say '**The Perfect Legend**'",
+            "css_vote_execute 'endround' 更换至The Perfect Legend(9连)，结束当前回合以立即生效？",
+            "say '注意！该模式仅在下回合生效'"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "The Alpha Legend(ALL)",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Map_Counter Enable",
+            "c_entfire Map_Counter SetValue 5",
+            "say '**The Alpha Legend**'",
+            "css_vote_execute 'endround' 更换至The Alpha Legend(ALL)结束当前回合以立即生效？",
+            "say '注意！该模式仅在下回合生效'"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arcana",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 2"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Aware",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue PressedSpeed"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Boatescape888",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 10"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cyberspace",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 11"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Deadcore",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 7"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Flower",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 15"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "HydroponicGarden",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 13"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Luciddream",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 1"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Minimal",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 12"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mgden",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 14"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mist",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 5"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Neochrome",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 6"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "NoName",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 8"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Offliner",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 3"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Realm",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 16"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Visualizer",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 4"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Xenovation",
+      "position": {"x": 5888.904785, "y": 8078.446777, "z": 307.148224},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say '10秒后飞船出发，请迅速上船'",
+            "[delay=10]c_entfire Map_Fog Disable",
+            "[delay=10]c_entfire Sky_Tower Disable",
+            "[delay=10]c_entfire Sky_Particle Stop",
+            "[delay=10]c_entfire Map_Bgm_* StopSound",
+            "[delay=11]c_entfire Map_Bgm_* Kill",
+            "[delay=10]c_entfire Afk_* Enable",
+            "[delay=10]c_entfire AirBoat_2 Open",
+            "c_entfire S1_Trigger_* Disable",
+            "[delay=6]c_entfire S1_Trigger_* Trigger",
+            "[delay=2]c_entfire Map_Case_2 InValue 9"
+          ]
+        }
+      ]
+    }
+  ]
+}

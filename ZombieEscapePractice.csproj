@@ -8,13 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CounterStrikeSharp.API" Version="*" >
+        <PackageReference Include="CounterStrikeSharp.API" Version="*">
 			<HintPath>D:/dev/CS2PluginsDev/addons/counterstrikesharp/api/CounterStrikeSharp.API.dll</HintPath>
 	    </PackageReference>
     </ItemGroup>
-	
-	<ItemGroup>
-		<EmbeddedResource Include="lang\*.json" />
-	</ItemGroup>
 
 </Project>

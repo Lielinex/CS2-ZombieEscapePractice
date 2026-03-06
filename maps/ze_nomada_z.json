@@ -1,0 +1,132 @@
+{
+  "ze_nomada_z": [
+    {
+      "name": "第一关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Level_Counter SetValue 1",
+            "css_vote_execute 'endround' 更换至第一关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第二关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Level_Counter SetValue 2",
+            "css_vote_execute 'endround' 更换至第二关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第三关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Level_Counter SetValue 3",
+            "css_vote_execute 'endround' 更换至第三关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第三关 BOSS战",
+      "position": {"x": 8482.483398,"y": -7468.760254,"z": 1899.411133},
+      "angle": {"pitch":0.000000 ,"yaw": 90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Lvl3_Tr_2 Kill",
+            "c_entfire Lvl3_Boss_Music StartSound",
+            "c_entfire Lvl3_Elevator_5 StartForward",
+            "[delay=3]c_entfire Fadein Fade",
+            "[delay=5]c_entfire Lvl3_Boss_Particle Start",
+            "[delay=5]c_entfire Lvl3_Music_1 StopSound",
+            "[delay=5]c_entfire Lvl3_Music_2 StopSound",
+            "[delay=6]c_entfire Lvl3_TP_1 Enable",
+            "[delay=6]c_entfire Lvl3_Boss_Attack_Timer Enable",
+            "[delay=6]c_entfire Fadeout Fade",
+            "[delay=7]c_entfire Lvl3_Elevator_5 StartBackward",
+            "[delay=7]say < WELCOME >",
+            "[delay=7]c_entfire Lvl3_AFK_TP_4 Enable",
+            "[delay=7]c_entfire Lvl3_Boss_HitBox SetDamageFilter",
+            "[delay=8]c_entfire Lvl3_Boss_Fall Enable",
+            "[delay=34]c_entfire Lvl3_Boss_Particle_Rage Start",
+            "[delay=35]c_entfire Lvl3_Boss_Particle Stop"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第三关 逃亡路",
+      "position": {"x": 8482.483398,"y": -7468.760254,"z": 1899.411133},
+      "angle": {"pitch":0.000000 ,"yaw": 90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Lvl3_TP_1_D_Case PickRandom",
+            "[delay=5]c_entfire Lvl3_Music_1 StopSound",
+            "[delay=5]c_entfire Lvl3_Music_2 StopSound",
+            "[delay=1]c_entfire Lvl3_Boss_Death Trigger",
+            "[delay=1]c_entfire Lvl3_Boss_Clean Trigger"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EX关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Level_Counter SetValue 4",
+            "css_vote_execute 'endround' 更换至第三关EX难度，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EX关 逃亡路",
+      "position": {"x": 8482.483398,"y": -7468.760254,"z": 1899.411133},
+      "angle": {"pitch":0.000000 ,"yaw": 90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Lvl3_TP_1_D_Case PickRandom",
+            "[delay=1]c_entfire Lvl3_Extreme_Boss_Death Trigger",
+            "[delay=1]c_entfire Lvl3_Extreme_Boss_Clean Trigger",
+            "[delay=1]c_entfire Fadein Fade",
+            "[delay=2]c_entfire Default_Processing Disable",
+            "[delay=2]c_entfire Default_Processing_Tem ForceSpawn",
+            "[delay=4]c_entfire Fadeout Fade",
+            "[delay=5]c_entfire Fadein Kill",
+            "[delay=5]c_entfire Fadeout Kill",
+            "[delay=10]c_entfire Lvl3_Extreme_Boss_Music StopSound"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RTV关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Level_Counter SetValue 5",
+            "css_vote_execute 'endround' 结束当前回合？"
+          ]
+        }
+      ]
+    }
+  ]
+}

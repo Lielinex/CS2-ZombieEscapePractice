@@ -1,6 +1,0 @@
-{
-    "practice.active": " [Practice] A practice session is already active. Please wait until the round ends.",
-    "practice.no_challenges": " [Practice] No challenges configured for this map ({0}).",
-    "menu.title": "Select Challenge Node",
-    "practice.activated": " [Practice] Challenge activated: {0}, practice in progress..."
-}

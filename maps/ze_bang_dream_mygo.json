@@ -1,0 +1,57 @@
+{
+  "ze_bang_dream_mygo": [
+    {
+      "name": "warmup",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire level_counter SetValue 0",
+            "css_vote_execute 'endround' 更换至热身关卡，结束当前回合以立即更换关卡？",
+            "say 热身关卡"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第一关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire level_counter SetValue 1",
+            "css_vote_execute 'endround' 更换至第一关，结束当前回合以立即更换关卡？",
+            "say 第一关"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第二关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire level_counter SetValue 2",
+            "css_vote_execute 'endround' 更换至第二关，结束当前回合以立即更换关卡？",
+            "say 第二关"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RTV1",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire level_counter SetValue 3",
+            "c_entfire rtv_counter SetValue 0",
+            "css_vote_execute 'endround' 更换至RTV1关，结束当前回合以立即更换关卡？",
+            "say RTV1关"
+          ]
+        }
+      ]
+    }
+  ]
+}
