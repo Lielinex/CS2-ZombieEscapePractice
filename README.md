@@ -153,4 +153,4 @@ csgo/addons/counterstrikesharp/
 
 本项目使用 MIT 许可证。详情请参见 [LICENSE](https://github.com/Lielinex/CS2-ZombieEscapePractice/tree/master?tab=MIT-1-ov-file) 文件。
 
-祝您练习愉快！ 🎉
+祝您早日成为ZE大神！ 🎉
