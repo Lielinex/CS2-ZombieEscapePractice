@@ -1,6 +1,6 @@
 ﻿# Zombie Escape Practice 插件
 
-**Zombie Escape Practice** 是一个为 CS2 Zombie Escape 模式中的弹幕图、跳刀图设计的练习插件，允许玩家通过简单的菜单命令直接跳转到地图中的特定节点（跳刀、弹幕、BOSS 战），跳过冗长的跑图流程。基于 CounterStrikeSharp 开发，配置灵活，支持创意工坊地图 ID 自动识别，并提供高级命令块（重复、随机、延时）和投票功能。
+**Zombie Escape Practice** 是一个为 CS2 Zombie Escape 模式中的弹幕图、跳刀图设计的练习插件，允许玩家通过简单的菜单命令直接跳转到地图中的特定节点（跳刀、弹幕、BOSS 战），跳过冗长的跑图流程。基于 CounterStrikeSharp 开发，配置灵活，支持创意工坊地图 ID 自动识别，并提供命令块（重复、随机、延时）和投票功能。
 
 ## ✨ 特性
 
@@ -117,7 +117,7 @@ sv_vote_allow_spectators 1
 sv_vote_count_spectator_votes 1
 
 ## 📁 文件结构
-
+```json
 csgo/addons/counterstrikesharp/
 ├── plugins/
 │   └── ZombieEscapePractice/
@@ -130,10 +130,11 @@ csgo/addons/counterstrikesharp/
                 ├── ze_example.json
                 ├── luciddream.json
                 └── ...
-
+```
 ## ⚠️ 注意事项
 
-服务器和客户端都需要有对应的resource/platform_<language>本地化文件支持投票界面显示（简体中文为platform_schinese.txt，放置于game/csgo/resource文件夹中）。可以自行上传创意工坊，也可以通过创意工坊订阅我的资源包 [CASZE Practice Server Resources](https://steamcommunity.com/sharedfiles/filedetails/?id=3678363447) 来获取。
+服务器和客户端都需要有对应的resource/platform_<language>本地化文件支持投票界面显示（简体中文为platform_schinese.txt，放置于game/csgo/resource文件夹中）。
+我还在验证通过创意工坊订阅获取本地化键的可行性，若不可行，我可能会大幅修改投票功能。
 
 坐标获取：游戏内开启控制台输入 cl_showpos 1 可查看当前位置。
 
