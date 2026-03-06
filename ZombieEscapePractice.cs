@@ -1,13 +1,12 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using PanoramaVote;
 
 namespace ZombieEscapePractice
 {
@@ -23,15 +22,26 @@ namespace ZombieEscapePractice
         private Dictionary<string, BlockBase> _namedBlocks = new();
         private Dictionary<string, BlockBase> _triggerableBlocks = new(); // 可触发的块
         private Dictionary<string, CounterStrikeSharp.API.Modules.Timers.Timer> _repeatTimers = new(); // 存储重复块的定时器
+        private CPanoramaVote? _voteHandler; // 投票处理器实例
 
         public override void Load(bool hotReload)
         {
+            Console.WriteLine("[ZombieEscapePractice] 正在加载.");
             _configManager.Load(ModuleDirectory);
             BuildNamedBlocks();
+            _voteHandler = new CPanoramaVote(this);
+            Console.WriteLine("[ZombieEscapePractice] Vote handler initialized.");
+            RegisterEventHandler<EventVoteCast>((@event, info) =>
+            {
+                _voteHandler.VoteCast(@event);
+                return HookResult.Continue;
+            });
 
             AddCommand("css_practice", "打开训练菜单", CommandPractice);
             AddCommand("css_prac", "打开训练菜单", CommandPractice);
             AddCommand("css_zep", "控制训练命令块 (enable/disable/trigger <targetname>)", CommandZep);
+            AddCommand("css_vote_for", "发起一个投票，格式: !vote_for <内容>", CommandVoteFor);
+            AddCommand("css_vote_execute", "发起一个执行命令的投票，格式: !vote_execute \"命令\" [说明]", CommandVoteExecute);
 
             RegisterEventHandler<EventRoundStart>(OnRoundStart);
             RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
@@ -544,6 +554,160 @@ namespace ZombieEscapePractice
                 {
                     Server.ExecuteCommand(actualCmd);
                 }
+            }
+        }
+
+        [RequiresPermissions("@css/vote")]
+        private void CommandVoteFor(CCSPlayerController? player, CommandInfo command)
+        {
+            if (command.ArgCount < 2)
+            {
+                if (player == null)
+                    Console.WriteLine(" [训练] 用法: css_vote_for <内容>");
+                else
+                    player.PrintToChat(" [训练] 用法: !vote_for <内容>");
+                return;
+            }
+
+            if (_voteHandler == null)
+            {
+                string msg = " [训练] 投票系统未初始化，请联系管理员。";
+                if (player == null) Console.WriteLine(msg);
+                else player.PrintToChat(msg);
+                return;
+            }
+
+            string content = command.ArgByIndex(1);
+            int caller = player?.Slot ?? VoteConstants.VOTE_CALLER_SERVER;
+
+            _voteHandler.Init();
+
+            bool success = _voteHandler.SendYesNoVoteToAll(
+                flDuration: 30.0f,
+                iCaller: caller,
+                sVoteTitle: "#SFUI_vote_panorama_vote_default",
+                sDetailStr: content,
+                resultCallback: VoteForResultCallback,
+                handler: VoteHandlerCallback
+            );
+
+            if (!success)
+            {
+                string failMsg = " [训练] 发起投票失败，可能已有投票在进行中或服务器未正确配置。";
+                if (player == null) Console.WriteLine(failMsg);
+                else player.PrintToChat(failMsg);
+            }
+        }
+
+        [RequiresPermissions("@css/vote")]
+        private void CommandVoteExecute(CCSPlayerController? player, CommandInfo command)
+        {
+            if (command.ArgCount < 2)
+            {
+                if (player == null)
+                    Console.WriteLine(" [训练] 用法: css_vote_execute \"命令\" [说明]");
+                else
+                    player.PrintToChat(" [训练] 用法: !vote_execute \"命令\" [说明]");
+                return;
+            }
+
+            if (_voteHandler == null)
+            {
+                string msg = " [训练] 投票系统未初始化，请联系管理员。";
+                if (player == null) Console.WriteLine(msg);
+                else player.PrintToChat(msg);
+                return;
+            }
+
+            // 解析带引号的命令（支持单引号或双引号）
+            string fullArgs = command.GetCommandString.Substring(command.GetCommandString.IndexOf(' ') + 1);
+            string cmd = "";
+            string description = "";
+
+            if (fullArgs.Length > 0 && (fullArgs[0] == '\'' || fullArgs[0] == '\"'))
+            {
+                char quote = fullArgs[0];
+                int endQuote = fullArgs.IndexOf(quote, 1);
+                if (endQuote > 0)
+                {
+                    cmd = fullArgs.Substring(1, endQuote - 1);
+                    string rest = fullArgs.Substring(endQuote + 1).Trim();
+                    description = string.IsNullOrEmpty(rest) ? $"执行命令: {cmd}" : rest;
+                }
+                else
+                {
+                    // 没有匹配的引号，退化为简单处理
+                    cmd = command.ArgByIndex(1);
+                    description = command.ArgCount >= 3 ? command.ArgByIndex(2) : $"执行命令: {cmd}";
+                }
+            }
+            else
+            {
+                cmd = command.ArgByIndex(1);
+                description = command.ArgCount >= 3 ? command.ArgByIndex(2) : $"执行命令: {cmd}";
+            }
+
+            int caller = player?.Slot ?? VoteConstants.VOTE_CALLER_SERVER;
+
+            _voteHandler.Init();
+
+            bool success = _voteHandler.SendYesNoVoteToAll(
+                flDuration: 30.0f,
+                iCaller: caller,
+                sVoteTitle: "#SFUI_vote_panorama_vote_orange",
+                sDetailStr: description,
+                resultCallback: (info) => VoteExecuteResultCallback(info, cmd),
+                handler: VoteHandlerCallback
+            );
+
+            if (!success)
+            {
+                string failMsg = " [训练] 发起投票失败，可能已有投票在进行中。";
+                if (player == null) Console.WriteLine(failMsg);
+                else player.PrintToChat(failMsg);
+            }
+        }
+
+        private bool VoteForResultCallback(YesNoVoteInfo info)
+        {
+            bool passed = info.yes_votes > info.no_votes;
+            Server.PrintToChatAll(passed ? " [训练] 投票通过！" : " [训练] 投票未通过。");
+            return passed;
+        }
+
+        private bool VoteExecuteResultCallback(YesNoVoteInfo info, string commandToExecute)
+        {
+            bool passed = info.yes_votes > info.no_votes;
+            if (passed)
+            {
+                Server.PrintToChatAll($" [训练] 投票通过！将执行命令: {commandToExecute}");
+                Server.ExecuteCommand(commandToExecute);
+            }
+            else
+            {
+                Server.PrintToChatAll(" [训练] 投票未通过，命令不会执行。");
+            }
+            return passed;
+        }
+
+        private void VoteHandlerCallback(YesNoVoteAction action, int param1, int param2)
+        {
+            // 可选：记录或提示
+            switch (action)
+            {
+                case YesNoVoteAction.VoteAction_Start:
+                    Console.WriteLine("[Vote] Vote started.");
+                    break;
+                case YesNoVoteAction.VoteAction_Vote:
+                    var player = Utilities.GetPlayerFromSlot(param1);
+                    if (player != null && player.IsValid)
+                    {
+                        player.PrintToChat($" [训练] 感谢投票！您选择了 {(param2 == 1 ? "赞成" : "反对")}。");
+                    }
+                    break;
+                case YesNoVoteAction.VoteAction_End:
+                    Console.WriteLine($"[Vote] Vote ended, reason: {(YesNoVoteEndReason)param1}");
+                    break;
             }
         }
     }

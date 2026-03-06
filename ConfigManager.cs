@@ -28,7 +28,7 @@ namespace ZombieEscapePractice
         public List<BlockBase> Blocks { get; set; } = new();
     }
 
-    public class ConfigManager
+    public class ConfigManager()
     {
         private string _configsFolderPath;
         public Dictionary<string, List<ChallengeConfig>> Config { get; private set; } = new();
@@ -78,56 +78,56 @@ namespace ZombieEscapePractice
             var example = new Dictionary<string, List<ChallengeConfig>>
             {
                 ["example_map"] = new List<ChallengeConfig>
-        {
-            new ChallengeConfig
-            {
-                Name = "跳刀练习示例",
-                Position = new PositionConfig { X = -1234.5f, Y = 567.8f, Z = 900.1f },
-                Blocks = new List<BlockBase>
                 {
-                    new OnceBlock
+                    new ChallengeConfig
                     {
-                        Commands = new List<string> { "ent_fire knife_spawner enable" }
-                    }
-                }
-            },
-            new ChallengeConfig
-            {
-                Name = "弹幕练习示例（延迟10秒）",
-                Position = null,
-                Blocks = new List<BlockBase>
-                {
-                    new OnceBlock
-                    {
-                        Commands = new List<string> { "[delay=10]ent_fire barrage_controller activate" }
-                    }
-                }
-            },
-            new ChallengeConfig
-            {
-                Name = "多块示例",
-                Blocks = new List<BlockBase>
-                {
-                    new OnceBlock { Commands = new List<string> { "say '第一行命令'" } },
-                    new DelayBlock
-                    {
-                        Interval = 4,
-                        Commands = new List<string> { "say '延迟4秒后的命令'" }
+                        Name = "example 1",
+                        Position = new PositionConfig { X = -1234.5f, Y = 567.8f, Z = 900.1f },
+                        Blocks = new List<BlockBase>
+                        {
+                            new OnceBlock
+                            {
+                                Commands = new List<string> { "ent_fire knife_spawner enable" }
+                            }
+                        }
                     },
-                    new RepeatBlock
+                    new ChallengeConfig
                     {
-                        Interval = 2,
-                        Count = 5,
-                        Commands = new List<string> { "c_entfire lvl2_final_dynamic SetAnimationNotLooping atk2" }
+                        Name = "example 2（delay 10 sec）",
+                        Position = null,
+                        Blocks = new List<BlockBase>
+                        {
+                            new OnceBlock
+                            {
+                                Commands = new List<string> { "[delay=10]ent_fire barrage_controller activate" }
+                            }
+                        }
                     },
-                    new RandomBlock
+                    new ChallengeConfig
                     {
-                        Mode = "PickRandomShuffle",
-                        Commands = new List<string> { "say '技能1'", "say '技能2'", "say '技能3'" }
+                        Name = "multi blocks example",
+                        Blocks = new List<BlockBase>
+                        {
+                            new OnceBlock { Commands = new List<string> { "say command once" } },
+                            new DelayBlock
+                            {
+                                Interval = 4,
+                                Commands = new List<string> { "say command delay 4 sec" }
+                            },
+                            new RepeatBlock
+                            {
+                                Interval = 2,
+                                Count = 5,
+                                Commands = new List<string> { "say command repeat 5 times" }
+                            },
+                            new RandomBlock
+                            {
+                                Mode = "PickRandomShuffle",
+                                Commands = new List<string> { "say 'skil1'", "say 'skill2'", "say 'skill3'" }
+                            }
+                        }
                     }
                 }
-            }
-        }
             };
             string json = JsonSerializer.Serialize(example, new JsonSerializerOptions { WriteIndented = true });
             string examplePath = Path.Combine(_configsFolderPath, "example.json");
