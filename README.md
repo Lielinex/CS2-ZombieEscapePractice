@@ -30,10 +30,12 @@
   "EnableVote": true,       // 开启投票功能 (!vote_for, !vote_execute)
   "EnableDebug": false      // 调试模式：开启后玩家可使用 !zep 控制命令块；关闭后仅服务器控制台可用
 }
+```
 ### 2. 地图配置
 地图配置文件存放在 csgo/addons/counterstrikesharp/configs/plugins/ZombieEscapePractice/maps/ 下，每个地图一个 JSON 文件，文件名任意（便于识别），但文件内必须以地图标识符（Workshop ID 或完整地图名）为键。基本结构如下：
+```json
 {
-  "ze_example_map": [          // 键：地图名或 Workshop ID
+  "ze_example_map": [          // 地图名（全名）或 Workshop ID
     {
       "name": "example",
       "position": { "x": -1234.5, "y": 567.8, "z": 900.1 },
@@ -73,7 +75,7 @@
     }
   ]
 }
-
+```
 块类型说明
 once：普通命令块，commands 中的每条命令执行一次，支持 [delay=X] 前缀。
 
@@ -126,7 +128,7 @@ csgo/addons/counterstrikesharp/
             ├── ZEPconfig.json               # 插件功能配置
             └── maps/                         # 地图配置文件
                 ├── ze_example.json
-                ├── 3169214837.json           # Workshop ID 文件
+                ├── luciddream.json
                 └── ...
 
 ## ⚠️ 注意事项
@@ -149,6 +151,6 @@ csgo/addons/counterstrikesharp/
 
 ## 📄 许可证
 
-本项目使用 MIT 许可证。详情请参见 [LICENSE](https://github.com/Lielinex/CS2-ZombieEscapePractice/License.txt) 文件。
+本项目使用 MIT 许可证。详情请参见 [LICENSE](https://github.com/Lielinex/CS2-ZombieEscapePractice/tree/master?tab=MIT-1-ov-file) 文件。
 
 祝您练习愉快！ 🎉
