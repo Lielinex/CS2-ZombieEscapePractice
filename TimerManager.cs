@@ -1,6 +1,4 @@
-﻿using CounterStrikeSharp.API.Modules.Timers;
-
-namespace ZombieEscapePractice
+﻿namespace ZombieEscapePractice
 {
     public static class TimerManager
     {

@@ -1,87 +1,154 @@
 ﻿# Zombie Escape Practice 插件
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![Metamod: Source](https://img.shields.io/badge/Metamod%3ASource)
-![CounterStrikeSharp](https://img.shields.io/badge/CounterStrikeSharp)
-
-**Zombie Escape Practice** 是一个为 CS2 Zombie Escape模式中的弹幕图、跳刀图设计的练习插件，允许玩家通过简单的菜单命令直接跳转到地图中的特定节点（跳刀、弹幕、BOSS 战），跳过冗长的跑图流程。基于 CounterStrikeSharp 开发，配置灵活，支持创意工坊地图 ID 自动识别。
+**Zombie Escape Practice** 是一个为 CS2 Zombie Escape 模式中的弹幕图、跳刀图设计的练习插件，允许玩家通过简单的菜单命令直接跳转到地图中的特定节点（跳刀、弹幕、BOSS 战），跳过冗长的跑图流程。基于 CounterStrikeSharp 开发，配置灵活，支持创意工坊地图 ID 自动识别，并提供高级命令块（重复、随机、延时）和投票功能。
 
 ## ✨ 特性
 
-- **快速跳转**：一键传送所有玩家到配置好的位置。
-- **灵活配置**：每个地图可配置多个训练节点，支持自定义触发命令和混合延时命令。
-- **地图识别**：优先使用创意工坊地图 ID 作为配置键，兼容普通地图名(必须完整地图名)。
-- **简单易用**：玩家通过聊天框菜单发送!prac或者!practice后选择，无需管理员权限
+- **快速跳转**：一键传送所有玩家到配置好的位置，并可设置视角朝向。
+- **灵活配置**：每个地图可配置多个训练节点，支持自定义触发命令，支持混合延时、重复、随机执行。
+- **动态命令块**：可为命令块指定 `targetname`，通过 `!zep` 命令动态启用/禁用/触发（如随机块）。
+- **投票功能**：内置全景投票系统，支持 `!vote_for` 和 `!vote_execute`（执行命令投票）。
+- **功能开关**：可通过插件配置文件 `ZEPconfig.json` 单独启用/关闭练习、投票、调试功能。
+- **地图识别**：优先使用创意工坊地图 ID 作为配置键，兼容完整地图名。
 
 ## 📦 安装
 
-1. **安装依赖**：确保服务器已正确安装最新版[Metamod: Source](https://sourcemm.net/downloads.php?branch=dev)和[CounterStrikeSharp](https://docs.cssharp.dev/)。
+1. **安装依赖**：确保服务器已正确安装最新版 [Metamod: Source](https://sourcemm.net/downloads.php?branch=dev) 和 [CounterStrikeSharp](https://docs.cssharp.dev/)。
 2. **下载插件**：从 [Releases](https://github.com/Lielinex/CS2-ZombieEscapePractice/releases) 下载最新版的 `ZombieEscapePractice.zip`。
 3. **放置文件**：将 `ZombieEscapePractice.zip` 解压后放入服务器的 `csgo/addons/counterstrikesharp/plugins/` 目录。
-4. **启动服务器**
+4. **启动服务器**：首次启动会自动生成插件配置文件夹和示例地图配置文件。
 
-首次启动后，插件会在插件配置目录`csgo/addons/counterstrikesharp/configs/plugins/`自动生成 `example.json` 配置文件，您可以根据需要修改。或者使用我另外提供的文件。
-
-可选依赖：很多ZombieEscape地图都需要[CS2Fixes](https://github.com/Source2ZE/CS2Fixes)插件才能正常运行，您可以考虑是否需要安装该插件。（若用我提供的配置文件则需要这个插件）
+**可选依赖**：很多 Zombie Escape 地图需要 [CS2Fixes](https://github.com/Source2ZE/CS2Fixes) 插件才能正常运行（若使用我提供的配置文件则需要此插件）。
 
 ## ⚙️ 配置
 
-配置文件位于 `csgo/addons/counterstrikesharp/configs/plugins/ZombieEscapePractice/ze_xxxx_map.json`，采用 JSON 格式。结构如下：
-
+### 1. 插件功能配置
+位于 `csgo/addons/counterstrikesharp/configs/plugins/ZombieEscapePractice/ZEPconfig.json`：
 ```json
 {
-  "maps": {
-    "123456789": {                     // 创意工坊地图 ID 或地图名
-      "challenges": [
+  "EnablePractice": true,   // 开启练习菜单 (!prac)
+  "EnableVote": true,       // 开启投票功能 (!vote_for, !vote_execute)
+  "EnableDebug": false      // 调试模式：开启后玩家可使用 !zep 控制命令块；关闭后仅服务器控制台可用
+}
+### 2. 地图配置
+地图配置文件存放在 csgo/addons/counterstrikesharp/configs/plugins/ZombieEscapePractice/maps/ 下，每个地图一个 JSON 文件，文件名任意（便于识别），但文件内必须以地图标识符（Workshop ID 或完整地图名）为键。基本结构如下：
+{
+  "ze_example_map": [          // 键：地图名或 Workshop ID
+    {
+      "name": "example",
+      "position": { "x": -1234.5, "y": 567.8, "z": 900.1 },
+      "angle": { "pitch": 0, "yaw": 90, "roll": 0 },
+      "blocks": [               // 命令块列表（顺序执行）
         {
-          "name": "1.跳刀练习", // 菜单显示的名称
-          "position": {                // 传送坐标 (X, Y, Z)
-            "x": -1234.5,
-            "y": 567.8,
-            "z": 900.1
-          },
-          "angle": { "Pitch": 0, "Yaw": 90, "Roll": 0 },
-          "command": ["ent_fire xxxxx trigger"] // 服务器执行的命令，具体命令请自行配置
+          "type": "once",
+          "commands": [
+            "ent_fire knife_spawner enable",
+            "[delay=2]say 2 sec"
+          ]
         },
         {
-          "name": "2.弹幕练习",
-          "position": { "x": 1000.0, "y": 2000.0, "z": 300.0 },
-          "angle": { "Pitch": 0, "Yaw": 90, "Roll": 0 },
-          "command": ["ent_fire xxxxx_controller activate"]
+          "type": "delay",
+          "interval": 5,
+          "commands": [ "say execute commands after 5 sec" ]
         }
       ]
     },
-    "ze_example_map": {                 // 使用地图名作为键的示例
-      "challenges": [
+    {
+      "name": "example_repeat",
+      "blocks": [
         {
-          "name": "BOSS 战练习",
-          "position": { "x": 500.0, "y": -500.0, "z": 128.0 },
-          "angle": { "Pitch": 0, "Yaw": 90, "Roll": 0 },
-          "command": ["ent_fire boss_relay trigger"]
+          "targetname": "skill_repeat",   // 可命名，用于动态控制
+          "type": "repeat",
+          "interval": 2,
+          "count": 10,                     // 重复10次，省略或 -1 表示无限
+          "commands": [ "c_entfire skill1" ]
+        },
+        {
+          "targetname": "random_skill",
+          "type": "random",
+          "mode": "PickRandomShuffle",      // 或 "PickRandom"
+          "commands": [ "say skillA", "say skillB", "say skillC" ]
         }
       ]
     }
-    "987654321": {
-      "challenges": [
-        {
-          "name": "逃亡路练习",
-          "position": { "x": 2000, "y": 3000, "z": 512 },
-          "angle": { "Pitch": 0, "Yaw": 90, "Roll": 0 },
-          "command": []                  // 留空不执行命令
-        }
-      ]
-    },
-    "ze_no_teleport": {
-      "challenges": [
-        {
-          "name": "挂机传送 - 仅命令",
-                                          // 不写"position"不执行传送
-          "command": [
-          "[delay=10]ent_fire afk_tele2 Enable", // 延时10秒执行afk2传送
-          "ent_fire afk_tele1 Enable" //立即执行afk1传送
-          ] 
-        }
-        ]
-    }
-  }
+  ]
 }
+
+块类型说明
+once：普通命令块，commands 中的每条命令执行一次，支持 [delay=X] 前缀。
+
+delay：统一延迟块，内部所有命令在 interval 秒后执行。
+
+repeat：重复执行块，enable 后每隔 interval 秒执行一次内部命令，count 为重复次数（-1 或省略为无限）。
+
+random：随机选择块，mode 为 PickRandom（每次随机）或 PickRandomShuffle（洗牌循环），每次从 commands 中选一条执行。
+
+所有块均可选 targetname 用于动态控制，以及 startdisabled 属性（默认 false）控制初始状态。
+
+## 🎮 使用命令
+
+练习功能
+!practice 或 !prac — 打开当前地图的训练菜单（需要 EnablePractice: true）。
+
+命令块调试
+!zep enable <targetname> — 启用指定的命令块（若为重复块则开始定时执行）。
+
+!zep disable <targetname> — 禁用指定的命令块（若为重复块则停止定时器）。
+
+!zep trigger <targetname> — 触发一次随机块（仅对 random 类型有效）。
+
+注意：当 EnableDebug 为 false 时，玩家无法使用 !zep 命令，但服务器控制台仍可使用css_zep <command>控制命令块。
+
+投票功能
+!vote_for <内容> — 发起一个是否投票，内容会显示在投票界面。
+
+!vote_execute "<命令>" [说明] — 发起一个是否执行指定命令的投票，通过后服务器执行命令。命令需用引号括起（支持单引号或双引号），说明可选。
+
+服务器控制台也可使用上述命令（前缀改为 css_，例如 css_vote_execute "say hello"）。
+
+## 📋 投票所需 ConVar
+
+确保服务器开启以下 ConVar（可在 server.cfg 中添加）：
+sv_allow_votes 1
+sv_vote_allow_in_warmup 1
+sv_vote_allow_spectators 1
+sv_vote_count_spectator_votes 1
+
+## 📁 文件结构
+
+csgo/addons/counterstrikesharp/
+├── plugins/
+│   └── ZombieEscapePractice/
+│       └── ZombieEscapePractice.dll
+└── configs/
+    └── plugins/
+        └── ZombieEscapePractice/
+            ├── ZEPconfig.json               # 插件功能配置
+            └── maps/                         # 地图配置文件
+                ├── ze_example.json
+                ├── 3169214837.json           # Workshop ID 文件
+                └── ...
+
+## ⚠️ 注意事项
+
+服务器和客户端都需要有对应的resource/platform_<language>本地化文件支持投票界面显示（简体中文为 resource/platform_schinese.txt）。可以自行上传创意工坊，也可以通过创意工坊订阅我的资源包 [CASZE Practice Server Resources](https://steamcommunity.com/sharedfiles/filedetails/?id=3678363447) 来获取。
+
+坐标获取：游戏内开启控制台输入 cl_showpos 1 可查看当前位置。
+
+创意工坊 ID：可在控制台输入 host_workshop_map 查看当前地图 ID。
+
+命令块名称：targetname 在配置文件中必须唯一，否则后加载的会覆盖前者。
+
+完成地图练习配置后可在服务器控制台输入css_plugins_reload ZombieEscapePractice重新加载配置。
+
+定时器清理：每回合结束会自动取消所有未执行的延时和重复定时器，确保下回合不受干扰。
+
+## 参考项目
+
+[SLAYER_PanoramaVote](https://github.com/zakriamansoor47/SLAYER_PanoramaVote)
+
+## 📄 许可证
+
+本项目使用 MIT 许可证。详情请参见 [LICENSE](https://github.com/Lielinex/CS2-ZombieEscapePractice/License.txt) 文件。
+
+祝您练习愉快！ 🎉

@@ -2,7 +2,6 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Timers;
-using CounterStrikeSharp.API.Modules.Utils;
 
 namespace ZombieEscapePractice
 {
@@ -51,7 +50,6 @@ namespace ZombieEscapePractice
                         _triggerableBlocks[block.Targetname] = block;
                     }
                 }
-                // 无嵌套块，无需递归
             }
         }
 
@@ -59,7 +57,6 @@ namespace ZombieEscapePractice
         {
             CancelAllRepeatTimers();
             _triggerableBlocks.Clear();
-            // 重新构建命名块（因为配置可能已变？但通常不变，可以不重建）
         }
 
         public void OnRoundEnd()

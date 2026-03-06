@@ -35,7 +35,7 @@ namespace ZombieEscapePractice
 
         public void Load(string moduleDirectory)
         {
-            // 构建地图配置文件夹路径: configs/plugins/ZombieEscapePractice/maps
+            // 地图配置文件夹路径: configs/plugins/ZombieEscapePractice/maps
             var basePath = Path.GetFullPath(Path.Combine(moduleDirectory, "..", "..", "configs", "plugins", "ZombieEscapePractice", "maps"));
             _mapsFolderPath = basePath;
 

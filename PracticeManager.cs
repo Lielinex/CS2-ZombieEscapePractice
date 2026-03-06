@@ -145,7 +145,6 @@ namespace ZombieEscapePractice
                 {
                     ExecuteCommands(delayBlock.Commands, baseDelay + delayBlock.Interval);
                 }
-                // 重复块和随机块由 BlockManager 处理，不在练习中直接执行
             }
         }
 

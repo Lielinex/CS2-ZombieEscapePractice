@@ -1,0 +1,149 @@
+{
+  "ze_visualizer": [
+    {
+      "name": "第一关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire admin_buttton1 Press",
+            "css_vote_execute 'endround' 更换至第一关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第二关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire admin_buttton2 Press",
+            "css_vote_execute 'endround' 更换至第二关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第三关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire admin_buttton3 Press",
+            "css_vote_execute 'endround' 更换至第三关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第四关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire admin_buttton4 Press",
+            "css_vote_execute 'endround' 更换至第四关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第五关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire admin_buttton5 Press",
+            "css_vote_execute 'endround' 更换至第五关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第五关 逃亡路",
+      "position": {"x":  -1868.362427, "y": 6711.970215, "z": -3187.618164},
+      "angle": {"pitch":0.000000 ,"yaw": -180.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "[delay=5]c_entfire s5_music01 StopSound",
+            "[delay=5]c_entfire s5_music02 StopSound",
+            "c_entfire s5_race_movelinear_timer Enable",
+            "c_entfire s5_race_movelinear_timer_2 Enable",
+            "c_entfire s5_rotcase PickRandom"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第六关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire admin_buttton6 Press",
+            "css_vote_execute 'endround' 更换至第六关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第六关 BOSS",
+      "position": {"x": -10235.871094, "y": 12927.627930, "z": 6256.284668},
+      "angle": {"pitch":0.000000 ,"yaw": 0.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "say | 15 |",
+            "[delay=5]say | 10 |",
+            "[delay=10]say | 5 |",
+            "[delay=5]c_entfire s6_music01 StopSound",
+            "[delay=5]c_entfire s6_music02 StopSound",
+            "[delay=8]c_entfire s6_teleport_fadeboss Fade",
+            "[delay=10]c_entfire s6_shield_push1 Enable",
+            "[delay=10]c_entfire s6_shield_push2 Enable",
+            "[delay=10]c_entfire s6_shield_push3 Enable",
+            "[delay=10]c_entfire s6_shield_push4 Enable",
+            "[delay=10]c_entfire global_shield_sound PlaySound",
+            "[delay=10]c_entfire s6_shield_particle Start",
+            "[delay=12]c_entfire stage6_music_boss PlaySound",
+            "[delay=14]c_entfire s6_teleport_start Kill",
+            "[delay=14]c_entfire part2_s6_template ForceSpawn",
+            "[delay=15]c_entfire s6_teleport_fadeboss_reverse Fade",
+            "[delay=15]c_entfire s6_teleport_sound PlaySound",
+            "[delay=15]c_entfire p2_s6_moving_platform_end_model SetParent p2_s6_moving_platform_end",
+            "[delay=15]c_entfire s6_teleport_to_boss_humans Enable",
+            "[delay=18]c_entfire s6_teleport_to_zm_boss Enable",
+            "[delay=22]c_entfire s6* Kill",
+            "[delay=25]c_entfire main_boss_start_relay Trigger",
+            "[delay=280]c_entfire stage6_music_boss PlaySound"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第六关 逃亡路",
+      "position": {"x": -13269.201172, "y": 1380.999999, "z": -270.936646},
+      "angle": {"pitch":0.000000 ,"yaw": 90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire part2_s6_template ForceSpawn",
+            "[delay=1]c_entfire main_boss_start_relay Trigger",
+            "[delay=2]c_entfire boss_death_relay Trigger",
+            "[delay=1]c_entfire s6_teleport_start Kill",
+            "[delay=1]c_entfire p2_s6_moving_platform_end_model SetParent p2_s6_moving_platform_end",
+            "[delay=5]c_entfire s6_music01 StopSound",
+            "[delay=5]c_entfire s6_music02 StopSound",
+            "[delay=5]c_entfire stage6_music_boss StopSound",
+            "[delay=22]c_entfire s6* Kill"
+          ]
+        }
+      ]
+    }
+  ]
+}

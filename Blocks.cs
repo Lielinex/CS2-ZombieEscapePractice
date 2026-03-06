@@ -3,13 +3,11 @@ using System.Text.Json.Serialization;
 
 namespace ZombieEscapePractice
 {
-    // 所有块的基类
     public abstract class BlockBase
     {
         [JsonPropertyName("targetname")] public string? Targetname { get; set; }
         [JsonIgnore] public bool Enabled { get; set; } = true;
 
-        // 为所有块类型提供StartDisabled属性的通用访问方式
         public virtual bool StartDisabled { get; set; } = false;
     }
 
@@ -31,7 +29,7 @@ namespace ZombieEscapePractice
     public class RepeatBlock : BlockBase
     {
         [JsonPropertyName("interval")] public float Interval { get; set; }
-        [JsonPropertyName("count")] public int? Count { get; set; } = -1; // -1 无限
+        [JsonPropertyName("count")] public int? Count { get; set; } = -1; // -1为无限
         [JsonPropertyName("commands")]
         public List<string> Commands { get; set; } = new();
         [JsonPropertyName("startdisabled")] public bool StartDisabledProperty { get; set; } = false;
@@ -46,7 +44,7 @@ namespace ZombieEscapePractice
     // 随机选择块（type = "random"）
     public class RandomBlock : BlockBase
     {
-        [JsonPropertyName("mode")] public string Mode { get; set; } = "PickRandom"; // PickRandom 或 PickRandomShuffle
+        [JsonPropertyName("mode")] public string Mode { get; set; } = "PickRandom"; //值为PickRandom或PickRandomShuffle
         [JsonPropertyName("commands")]
         public List<string> Commands { get; set; } = new();
         [JsonPropertyName("startdisabled")] public bool StartDisabledProperty { get; set; } = false;
@@ -74,7 +72,7 @@ namespace ZombieEscapePractice
         }
     }
 
-    // 自定义转换器，用于反序列化 blocks 数组（根据 type 字段选择具体类型）
+    // 自定义转换器，用于反序列化 blocks 数组，根据 type 字段选择具体类型
     public class BlockConverter : JsonConverter<List<BlockBase>>
     {
         public override List<BlockBase> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -84,7 +82,6 @@ namespace ZombieEscapePractice
 
             var list = new List<BlockBase>();
 
-            // 使用标准的反序列化方法，通过中间类来处理
             using var document = JsonDocument.ParseValue(ref reader);
             var arrayEnumerator = document.RootElement.EnumerateArray();
 
@@ -111,7 +108,6 @@ namespace ZombieEscapePractice
 
                 if (block != null)
                 {
-                    // 根据StartDisabled属性设置初始启用状态
                     block.Enabled = !block.StartDisabled;
                     list.Add(block);
                     Console.WriteLine($"[ZEP ConfigsHelper] 成功解析块类型: {type}, 名称: {block.Targetname ?? "unnamed"}, 初始状态: {(block.Enabled ? "启用" : "禁用")}");

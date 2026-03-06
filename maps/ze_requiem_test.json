@@ -1,0 +1,86 @@
+{
+  "ze_requiem_test": [
+    {
+      "name": "第一关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Stage_Switcher_Brush_Lv1 Disable",
+            "c_entfire Stage_Switcher_Brush_Lv2 Enable",
+            "c_entfire Stage_Switcher_Brush_RTVA Enable",
+            "say 调关至ACT 1，下回合生效",
+            "css_vote_execute 'endround' 更换至第一关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第一关 逃亡路列车刀",
+      "position": {"x": -3497.885010, "y": 10977.762695, "z": 1020.272888},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "[delay=3]c_entfire Global_Sound_BGM_Act1_1 StopSound",
+            "c_entfire Global_Sound_BGM_Act1_2 PlaySound",
+            "c_entfire St1_Escape_Gate Open",
+            "c_entfire St1_Escape_FinalFloor Kill",
+            "[delay=10]c_entfire St1_Escape_Damaku_Timer Enable",
+            "[delay=120]c_entfire St1_Escape_Final_Platform2 StartForward",
+            "[delay=10]c_entfire Global_Sound_GateOpen PlaySound",
+            "c_entfire Global_St1_Tele_* Disable",
+            "[delay=1]c_entfire Global_St1_Tele_* Enable",
+            "[delay=10]c_entfire Global_Fade_Red_All Fade"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第二关",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Stage_Switcher_Brush_Lv1 Enable",
+            "c_entfire Stage_Switcher_Brush_Lv2 Disable",
+            "c_entfire Stage_Switcher_Brush_RTVA Enable",
+            "say 调关至ACT 2，下回合生效",
+            "css_vote_execute 'endround' 更换至第一关，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "第二关 天坠弹幕刀",
+      "position": {"x": 9931.739258, "y": -917.234802, "z": 6483.898438},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "[delay=3]c_entfire Global_Sound_BGM_Act2_1 StopSound",
+            "[delay=3]c_entfire Global_Sound_BGM_Act2_2 StopSound",
+            "[delay=3]c_entfire Global_Sound_BGM_Act2_3 StopSound",
+            "c_entfire Global_Sound_BGM_Act2_4 PlaySound",
+            "c_entfire Stage2_Mover_3 StartForward",
+            "[delay=5]c_entfire Stage2_Final_tele Enable",
+            "[delay=5]c_entfire Stage2_Final_Trigger Enable"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RTVA",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire Admin_Button_Training_RTVA Press"
+          ]
+        }
+      ]
+    }
+  ]
+}

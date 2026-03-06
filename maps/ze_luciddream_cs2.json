@@ -1,0 +1,93 @@
+{
+  "ze_luciddreams_cs2": [
+    {
+      "name": "开启地图自带的训练模式",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire admin_button_2 Press",
+            "css_vote_execute 'endround' 开启地图自带的训练模式，结束当前回合以立即生效？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "关闭地图自带的训练模式",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire admin_button_1 Press"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "跳刀BOSS训练",
+      "position": {"x": -12973.716797, "y": 11668.802734, "z": 12354.999999},
+      "angle": {"pitch":0.000000 ,"yaw": 90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "[delay=2]c_entfire final_laser_boss Enable",
+            "c_entfire level1_trigger Kill",
+            "[delay=1]c_entfire LV1_END_BOSS KeyValues health 70000",
+            "c_entfire lv1_notshootablewall KillHierarchy",
+            "[delay=2]c_entfire boss_particle_s1 Start",
+            "[delay=2]c_entfire particles_moving_s1 Start",
+            "[delay=3]c_entfire laser_start_timer2 Enable",
+            "[delay=5]c_entfire lv1_music_1 StopSound",
+            "[delay=5]c_entfire lv1_music_2 StopSound",
+            "[delay=5]c_entfire lv1_z_p KillHierarchy"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "列车刀训练",
+      "position": {"x": -12971.803711, "y": 14499.091797, "z": 12357.313477},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire level1_trigger Kill",
+            "c_entfire lv1_end_trigger Touch",
+            "c_entfire LV1_GO_GO_GO Kill",
+            "c_entfire LV1_END_BOSS Break",
+            "c_entfire laser_start_timer2 KillHierarchy",
+            "c_entfire LV1_FLOOR_BREAK_BOSS Break",
+            "[delay=4]c_entfire st1_boss_particle_e Start",
+            "[delay=5]c_entfire lv1_music_1 StopSound",
+            "[delay=5]c_entfire lv1_music_2 StopSound"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "无尽列车刀训练",
+      "position": {"x": -12971.803711, "y": 14499.091797, "z": 12357.313477},
+      "angle": {"pitch":0.000000 ,"yaw": -90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire level1_trigger Kill",
+            "c_entfire lv1_end_trigger Touch",
+            "c_entfire LV1_GO_GO_GO Kill",
+            "c_entfire LV1_END_BOSS Kill",
+            "c_entfire laser_start_timer2 KillHierarchy",
+            "c_entfire LV1_FLOOR_BREAK_BOSS Break",
+            "[delay=4]c_entfire st1_boss_particle_e Start",
+            "[delay=5]c_entfire lv1_music_1 StopSound",
+            "[delay=5]c_entfire lv1_music_2 StopSound",
+            "[delay=5]c_entfire s_2_timer Enable",
+            "[delay=5]c_entfire s_3_timer Enable"
+          ]
+        }
+      ]
+    }
+  ]
+}

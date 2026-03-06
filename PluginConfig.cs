@@ -16,7 +16,6 @@ namespace ZombieEscapePractice
 
         public static PluginConfig Load(string configPath)
         {
-            // 确保配置文件所在目录存在
             string? directory = Path.GetDirectoryName(configPath);
             if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
             {
