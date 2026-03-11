@@ -73,8 +73,10 @@ namespace ZombieEscapePractice
     }
 
     // 自定义转换器，用于反序列化 blocks 数组，根据 type 字段选择具体类型
+    
     public class BlockConverter : JsonConverter<List<BlockBase>>
     {
+        private readonly PluginConfig _pluginConfig;
         public override List<BlockBase> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType != JsonTokenType.StartArray)
@@ -88,7 +90,7 @@ namespace ZombieEscapePractice
             int index = 0;
             foreach (var element in arrayEnumerator)
             {
-                Console.WriteLine($"[ZEP ConfigsHelper] 处理元素 {index}: {element.GetRawText()}");
+                if (_pluginConfig.EnableDebug) Console.WriteLine($"[ZEP ConfigsHelper] 处理元素 {index}: {element.GetRawText()}");
 
                 if (element.ValueKind != JsonValueKind.Object)
                     throw new JsonException($"blocks 数组第 {index} 个元素必须是对象，但遇到了 {element.ValueKind} 类型的值");
@@ -110,7 +112,7 @@ namespace ZombieEscapePractice
                 {
                     block.Enabled = !block.StartDisabled;
                     list.Add(block);
-                    Console.WriteLine($"[ZEP ConfigsHelper] 成功解析块类型: {type}, 名称: {block.Targetname ?? "unnamed"}, 初始状态: {(block.Enabled ? "启用" : "禁用")}");
+                    if(_pluginConfig.EnableDebug) Console.WriteLine($"[ZEP ConfigsHelper] 成功解析块类型: {type}, 名称: {block.Targetname ?? "unnamed"}, 初始状态: {(block.Enabled ? "启用" : "禁用")}");
                 }
 
                 index++;
