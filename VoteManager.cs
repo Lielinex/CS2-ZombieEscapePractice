@@ -1,5 +1,6 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
 using PanoramaVote;
@@ -9,15 +10,32 @@ namespace ZombieEscapePractice
     public class VoteManager
     {
         private readonly BasePlugin _plugin;
+        private readonly PluginConfig _pluginConfig;
         private CPanoramaVote? _voteHandler;
 
-        public VoteManager(BasePlugin plugin)
+        public string Prefix => $" {ChatColors.Gold}[{ChatColors.Green}ZEP{ChatColors.Gold}]";
+
+        public bool AdminCheck(CCSPlayerController? player)
+        {
+            if (player == null) return true; // server console
+            if (!player.IsValid) return false;
+
+            if (!AdminManager.PlayerHasPermissions(player, "@css/root"))
+            {
+                player.PrintToChat($"{Prefix} {ChatColors.Red}You don't have permission to use this command.");
+                return false;
+            }
+            return true;
+        }
+
+        public VoteManager(BasePlugin plugin, PluginConfig pluginConfig)
         {
             _plugin = plugin;
+            _pluginConfig = pluginConfig;
             _voteHandler = new CPanoramaVote(plugin);
             _plugin.RegisterEventHandler<EventVoteCast>((@event, info) =>
             {
-                _voteHandler.VoteCast(@event);
+                _voteHandler?.VoteCast(@event);
                 return HookResult.Continue;
             });
         }
@@ -27,17 +45,18 @@ namespace ZombieEscapePractice
             if (command.ArgCount < 2)
             {
                 if (player == null)
-                    Console.WriteLine(" [训练] 用法: css_vote_for <内容>");
+                    Console.WriteLine(" [ZEP] 用法: css_vote_for <内容>");
                 else
-                    player.PrintToChat(" [训练] 用法: !vote_for <内容>");
+                    player.PrintToChat($"{Prefix} {ChatColors.Red} 用法: !vote_for <内容>");
                 return;
             }
 
             if (_voteHandler == null)
             {
-                string msg = " [训练] 投票系统未初始化，请联系管理员。";
-                if (player == null) Console.WriteLine(msg);
-                else player.PrintToChat(msg);
+                if (player == null)
+                    Console.WriteLine(" [ZEP] 投票系统未初始化，请联系管理员。");
+                else
+                    player.PrintToChat($"{Prefix} {ChatColors.Red} 投票系统未初始化，请联系管理员。");
                 return;
             }
 
@@ -46,20 +65,24 @@ namespace ZombieEscapePractice
 
             _voteHandler.Init();
 
+            // 根据配置选择标题
+            string title = _pluginConfig.VoteCustom ? "#SFUI_vote_panorama_vote_default" : "投票";
+
             bool success = _voteHandler.SendYesNoVoteToAll(
-                flDuration: 30.0f,
+                flDuration: _pluginConfig.VoteDuration,
                 iCaller: caller,
-                sVoteTitle: "#SFUI_vote_panorama_vote_default",
+                sVoteTitle: title,
                 sDetailStr: content,
-                resultCallback: VoteForResultCallback,
+                resultCallback: (info) => VoteForResultCallback(info),
                 handler: VoteHandlerCallback
             );
 
             if (!success)
             {
-                string failMsg = " [训练] 发起投票失败，可能已有投票在进行中或服务器未正确配置。";
-                if (player == null) Console.WriteLine(failMsg);
-                else player.PrintToChat(failMsg);
+                if (player == null)
+                    Console.WriteLine(" [ZEP] 发起投票失败，可能已有投票在进行中或服务器未正确配置。");
+                else
+                    player.PrintToChat($"{Prefix} {ChatColors.Red} 发起投票失败，可能已有投票在进行中或服务器未正确配置。");
             }
         }
 
@@ -68,17 +91,18 @@ namespace ZombieEscapePractice
             if (command.ArgCount < 2)
             {
                 if (player == null)
-                    Console.WriteLine(" [训练] 用法: css_vote_execute \"命令\" [说明]");
+                    Console.WriteLine(" [ZEP] 用法: css_vote_execute \"命令\" [说明]");
                 else
-                    player.PrintToChat(" [训练] 用法: !vote_execute \"命令\" [说明]");
+                    player.PrintToChat($"{Prefix} {ChatColors.Red} 用法: !vote_execute \"命令\" [说明]");
                 return;
             }
 
             if (_voteHandler == null)
             {
-                string msg = " [训练] 投票系统未初始化，请联系管理员。";
-                if (player == null) Console.WriteLine(msg);
-                else player.PrintToChat(msg);
+                if (player == null)
+                    Console.WriteLine(" [ZEP] 投票系统未初始化，请联系管理员。");
+                else
+                    player.PrintToChat($"{Prefix} {ChatColors.Red} 投票系统未初始化，请联系管理员。");
                 return;
             }
 
@@ -112,10 +136,12 @@ namespace ZombieEscapePractice
 
             _voteHandler.Init();
 
+            string title = _pluginConfig.VoteCustom ? "#SFUI_vote_panorama_vote_orange" : "执行命令";
+
             bool success = _voteHandler.SendYesNoVoteToAll(
-                flDuration: 30.0f,
+                flDuration: _pluginConfig.VoteDuration,
                 iCaller: caller,
-                sVoteTitle: "#SFUI_vote_panorama_vote_orange",
+                sVoteTitle: title,
                 sDetailStr: description,
                 resultCallback: (info) => VoteExecuteResultCallback(info, cmd),
                 handler: VoteHandlerCallback
@@ -123,30 +149,87 @@ namespace ZombieEscapePractice
 
             if (!success)
             {
-                string failMsg = " [训练] 发起投票失败，可能已有投票在进行中。";
-                if (player == null) Console.WriteLine(failMsg);
-                else player.PrintToChat(failMsg);
+                if (player == null)
+                    Console.WriteLine(" [ZEP] 发起投票失败，可能已有投票在进行中。");
+                else
+                    player.PrintToChat($"{Prefix} {ChatColors.Red} 发起投票失败，可能已有投票在进行中。");
             }
+        }
+
+        public void CommandVoteRestart(CCSPlayerController? player, CommandInfo info)
+        {
+            if (!AdminCheck(player))
+                return;
+
+            float duration = _pluginConfig.VoteDuration;
+            float ratio = _pluginConfig.VoteRatio;
+            int caller = player?.Slot ?? VoteConstants.VOTE_CALLER_SERVER;
+
+            if (_voteHandler == null)
+            {
+                if (player == null)
+                    Console.WriteLine(" [ZEP] 投票系统未初始化，请联系管理员。");
+                else
+                    player.PrintToChat($"{Prefix} {ChatColors.Red} 投票系统未初始化，请联系管理员。");
+                return;
+            }
+
+            _voteHandler.Init();
+
+            YesNoVoteResult resultCallback = (voteInfo) =>
+            {
+                int yes = voteInfo.yes_votes;
+                int no = voteInfo.no_votes;
+                int total = yes + no;
+
+                if (total == 0)
+                {
+                    Server.PrintToChatAll($"{Prefix} {ChatColors.Red}Vote ended with no votes.");
+                    return false;
+                }
+
+                float yesRatio = (float)yes / total;
+                bool passed = yesRatio >= ratio;
+
+                if (passed)
+                {
+                    Server.PrintToChatAll($"{Prefix} {ChatColors.Green}Vote passed ({yesRatio * 100:F1}%). Restarting match...");
+                    Server.ExecuteCommand("mp_restartgame 1");
+                }
+                else
+                {
+                    Server.PrintToChatAll($"{Prefix} {ChatColors.Red}Vote failed ({yesRatio * 100:F1}% yes, need {ratio * 100:F0}%).");
+                }
+                return passed;
+            };
+
+            _voteHandler.SendYesNoVoteToAll(duration, caller, "#SFUI_vote_restart_game", "", resultCallback);
         }
 
         private bool VoteForResultCallback(YesNoVoteInfo info)
         {
-            bool passed = info.yes_votes > info.no_votes;
-            Server.PrintToChatAll(passed ? " [训练] 投票通过！" : " [训练] 投票未通过。");
+            int yes = info.yes_votes;
+            int no = info.no_votes;
+            int total = yes + no;
+            bool passed = total > 0 && (float)yes / total >= _pluginConfig.VoteRatio;
+            Server.PrintToChatAll(passed ? $"{Prefix} {ChatColors.Green}投票通过！" : $"{Prefix} {ChatColors.Red}投票未通过。");
             return passed;
         }
 
         private bool VoteExecuteResultCallback(YesNoVoteInfo info, string commandToExecute)
         {
-            bool passed = info.yes_votes > info.no_votes;
+            int yes = info.yes_votes;
+            int no = info.no_votes;
+            int total = yes + no;
+            bool passed = total > 0 && (float)yes / total >= _pluginConfig.VoteRatio;
             if (passed)
             {
-                Server.PrintToChatAll($" [训练] 投票通过！将执行命令: {commandToExecute}");
+                Server.PrintToChatAll($"{Prefix} {ChatColors.Green} 投票通过！{ChatColors.Gold} 将执行命令: {commandToExecute}");
                 Server.ExecuteCommand(commandToExecute);
             }
             else
             {
-                Server.PrintToChatAll(" [训练] 投票未通过，命令不会执行。");
+                Server.PrintToChatAll($"{Prefix} {ChatColors.Red} 投票未通过，命令不会执行。");
             }
             return passed;
         }
@@ -156,17 +239,17 @@ namespace ZombieEscapePractice
             switch (action)
             {
                 case YesNoVoteAction.VoteAction_Start:
-                    Console.WriteLine("[Vote] Vote started.");
+                    Console.WriteLine("[ZEP] Vote started.");
                     break;
                 case YesNoVoteAction.VoteAction_Vote:
                     var player = Utilities.GetPlayerFromSlot(param1);
                     if (player != null && player.IsValid)
                     {
-                        player.PrintToChat($" [训练] 感谢投票！您选择了 {(param2 == 1 ? "赞成" : "反对")}。");
+                        player.PrintToChat($"{Prefix} {ChatColors.Red} 感谢投票！您选择了 {(param2 == 1 ? "反对" : "赞成")}。");
                     }
                     break;
                 case YesNoVoteAction.VoteAction_End:
-                    Console.WriteLine($"[Vote] Vote ended, reason: {(YesNoVoteEndReason)param1}");
+                    Console.WriteLine($"[ZEP] Vote ended, reason: {(YesNoVoteEndReason)param1}");
                     break;
             }
         }

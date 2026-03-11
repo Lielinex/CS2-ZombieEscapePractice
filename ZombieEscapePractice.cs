@@ -1,4 +1,6 @@
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
+using PanoramaVote;
 
 namespace ZombieEscapePractice
 {
@@ -7,13 +9,16 @@ namespace ZombieEscapePractice
         public override string ModuleName => "ZombieEscapePractice";
         public override string ModuleDescription => "僵尸逃跑弹幕图练习插件";
         public override string ModuleAuthor => "Lielinex";
-        public override string ModuleVersion => "1.0.0";
+        public override string ModuleVersion => "1.0.1";
+
+        public string Prefix = $" {ChatColors.Gold}[{ChatColors.Green}ZEP{ChatColors.Gold}]";
 
         private PluginConfig _pluginConfig;
         private ConfigManager _configManager;
         private BlockManager _blockManager;
         private PracticeManager? _practiceManager;
         private VoteManager? _voteManager;
+        private CPanoramaVote? _voteHandler;
 
         public override void Load(bool hotReload)
         {
@@ -37,13 +42,19 @@ namespace ZombieEscapePractice
 
             if (_pluginConfig.EnableVote)
             {
-                _voteManager = new VoteManager(this);
+                _voteManager = new VoteManager(this, _pluginConfig);
                 AddCommand("css_vote_for", "发起一个投票，格式: !vote_for <内容>", (player, info) => _voteManager.CommandVoteFor(player, info));
                 AddCommand("css_vote_execute", "发起一个执行命令的投票，格式: !vote_execute \"命令\" [说明]", (player, info) => _voteManager.CommandVoteExecute(player, info));
+                AddCommand("css_vote_restart", "发起一个重启回合投票，格式: !vote_restart", (player, info) => _voteManager.CommandVoteRestart(player, info));
             }
 
             RegisterEventHandler<EventRoundStart>(OnRoundStart);
             RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
+            RegisterEventHandler<EventVoteCast>((@event, info) =>
+            {
+                _voteHandler.VoteCast(@event);
+                return HookResult.Continue;
+            });
 
             Console.WriteLine("[ZombieEscapePractice] 加载完成！");
         }

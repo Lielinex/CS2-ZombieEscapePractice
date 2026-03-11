@@ -14,6 +14,15 @@ namespace ZombieEscapePractice
         [JsonPropertyName("EnableDebug")]
         public bool EnableDebug { get; set; } = false;
 
+        [JsonPropertyName("VoteCustom")]
+        public bool VoteCustom { get; set; } = false;
+
+        [JsonPropertyName("VoteRatio")]
+        public float VoteRatio { get; set; } = 0.5f;
+
+        [JsonPropertyName("VoreDuration")]
+        public float VoteDuration { get; set; } = 30.0f;
+
         public static PluginConfig Load(string configPath)
         {
             string? directory = Path.GetDirectoryName(configPath);

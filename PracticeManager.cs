@@ -14,6 +14,8 @@ namespace ZombieEscapePractice
         private readonly ConfigManager _configManager;
         private bool _isPracticeActive = false;
 
+        public string Prefix = $" {ChatColors.Gold}[{ChatColors.Green}ZEP{ChatColors.Gold}]";
+
         public PracticeManager(BasePlugin plugin, ConfigManager configManager)
         {
             _plugin = plugin;
@@ -29,14 +31,14 @@ namespace ZombieEscapePractice
 
             if (_isPracticeActive)
             {
-                player.PrintToChat(" [训练] 当前已有激活的训练，请等待回合结束。");
+                player.PrintToChat(" {Prefix} {ChatColors.Red} 当前已有激活的训练，请等待回合结束。");
                 return;
             }
 
             string mapKey = GetCurrentMapKey();
             if (!_configManager.Config.TryGetValue(mapKey, out var challenges) || challenges.Count == 0)
             {
-                player.PrintToChat($" [训练] 当前地图 ({mapKey}) 没有配置可用的训练。");
+                player.PrintToChat($" {Prefix} {ChatColors.Red} 当前地图 ({mapKey}) 没有配置可用的训练。");
                 return;
             }
 
@@ -97,7 +99,7 @@ namespace ZombieEscapePractice
             {
                 if (player != null && player.IsValid)
                 {
-                    player.PrintToChat($" [训练] 已激活训练: {challenge.Name}，正在进行中...");
+                    player.PrintToChat($" {Prefix} {ChatColors.Red} 已激活训练: {challenge.Name}，正在进行中...");
                 }
             }
         }

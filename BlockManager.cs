@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Timers;
+using CounterStrikeSharp.API.Modules.Utils;
 
 namespace ZombieEscapePractice
 {
@@ -13,6 +14,8 @@ namespace ZombieEscapePractice
         private Dictionary<string, BlockBase> _namedBlocks = new();
         private Dictionary<string, BlockBase> _triggerableBlocks = new();
         private Dictionary<string, CounterStrikeSharp.API.Modules.Timers.Timer> _repeatTimers = new();
+
+        public string Prefix = $" {ChatColors.Gold}[{ChatColors.Green}ZEP{ChatColors.Gold}]";
 
         public BlockManager(BasePlugin plugin, ConfigManager configManager, PluginConfig pluginConfig)
         {
@@ -79,15 +82,16 @@ namespace ZombieEscapePractice
             // 检查调试开关：如果调试关闭且是玩家执行，则拒绝
             if (player != null && !_pluginConfig.EnableDebug)
             {
-                player.PrintToChat(" [训练] 调试模式已关闭，无法使用此命令。");
+                player.PrintToChat($" {Prefix} {ChatColors.Red} 调试模式已关闭，无法使用此命令。");
                 return;
             }
 
             if (command.ArgCount < 3)
             {
-                string message = "用法: !zep enable/disable/trigger <targetname>";
-                if (player != null) player.PrintToChat(message);
-                else Console.WriteLine(message);
+                if (player != null)
+                    player.PrintToChat("{Prefix} {ChatColors.Red} 用法: !zep enable/disable/trigger <targetname>");
+                else
+                    Console.WriteLine(" [ZEP] 用法: !zep enable/disable/trigger <targetname>");
                 return;
             }
 
@@ -96,9 +100,10 @@ namespace ZombieEscapePractice
 
             if (!_namedBlocks.TryGetValue(target, out var block))
             {
-                string message = $"未找到名为 {target} 的命令块";
-                if (player != null) player.PrintToChat(message);
-                else Console.WriteLine(message);
+                if (player != null)
+                    player.PrintToChat($"{Prefix} {ChatColors.Red} 未找到名为 {target} 的命令块");
+                else
+                    Console.WriteLine($"[ZEP] 未找到名为 {target} 的命令块");
                 return;
             }
 
@@ -110,22 +115,21 @@ namespace ZombieEscapePractice
                     if (!_repeatTimers.ContainsKey(target) || IsTimerKilled(_repeatTimers[target]))
                     {
                         StartRepeatTimer(target, repeatBlock);
-                        string message = $"已启用并启动重复块: {target}";
-                        if (player != null) player.PrintToChat(message);
-                        else Console.WriteLine(message);
+                        if (player != null)
+                            player.PrintToChat($" {Prefix} {ChatColors.Red} 已启用并启动重复块: {target}");
+                        else
+                            Console.WriteLine($" [ZEP] 已启用并启动重复块: {target}");
                     }
                     else
                     {
-                        string message = $"重复块 {target} 已经在运行中";
-                        if (player != null) player.PrintToChat(message);
-                        else Console.WriteLine(message);
+                        if (player != null) player.PrintToChat($" {Prefix} {ChatColors.Red} 重复块 {target} 已经在运行中");
+                        else Console.WriteLine($" [ZEP] 重复块 {target} 已经在运行中");
                     }
                 }
                 else
                 {
-                    string message = $"已启用命令块: {target}";
-                    if (player != null) player.PrintToChat(message);
-                    else Console.WriteLine(message);
+                    if (player != null) player.PrintToChat($" {Prefix} {ChatColors.Red} 已启用命令块: {target}");
+                    else Console.WriteLine($" [ZEP] 已启用命令块: {target}");
                 }
             }
             else if (action == "disable")
@@ -136,15 +140,17 @@ namespace ZombieEscapePractice
                     var timer = _repeatTimers[target];
                     if (!IsTimerKilled(timer)) timer.Kill();
                     _repeatTimers.Remove(target);
-                    string message = $"已禁用并停止重复块: {target}";
-                    if (player != null) player.PrintToChat(message);
-                    else Console.WriteLine(message);
+                    if (player != null)
+                        player.PrintToChat($" {Prefix} {ChatColors.Red} 已禁用并停止重复块: {target}");
+                    else
+                        Console.WriteLine($" [ZEP] 已禁用并停止重复块: {target}");
                 }
                 else
                 {
-                    string message = $"已禁用命令块: {target}";
-                    if (player != null) player.PrintToChat(message);
-                    else Console.WriteLine(message);
+                    if (player != null)
+                        player.PrintToChat($" {Prefix} {ChatColors.Red} 已禁用命令块: {target}");
+                    else
+                        Console.WriteLine($" [ZEP] 已禁用命令块: {target}");
                 }
             }
             else if (action == "trigger")
@@ -155,29 +161,29 @@ namespace ZombieEscapePractice
                     if (block.Enabled)
                     {
                         TriggerBlock(block);
-                        string message = $"已触发命令块: {target}";
-                        if (player != null) player.PrintToChat(message);
-                        else Console.WriteLine(message);
+                        if (player != null)
+                            player.PrintToChat($" {Prefix} {ChatColors.Red} 已触发命令块: {target}");
+                        else
+                            Console.WriteLine($" [ZEP] 已触发命令块: {target}");
                     }
                     else
                     {
-                        string message = $"命令块 {target} 当前处于禁用状态，无法触发";
-                        if (player != null) player.PrintToChat(message);
-                        else Console.WriteLine(message);
+                        if (player != null) player.PrintToChat($" {Prefix} {ChatColors.Red} 命令块 {target} 当前处于禁用状态，无法触发");
+                        else Console.WriteLine($" [ZEP] 命令块 {target} 当前处于禁用状态，无法触发");
                     }
                 }
                 else
                 {
-                    string message = $"命令块 {target} 不支持触发操作";
-                    if (player != null) player.PrintToChat(message);
-                    else Console.WriteLine(message);
+                    if (player != null) player.PrintToChat($" {Prefix} {ChatColors.Red} 命令块 {target} 不支持触发操作");
+                    else Console.WriteLine($" [ZEP] 命令块 {target} 不支持触发操作");
                 }
             }
             else
             {
-                string message = "动作必须是 enable、disable 或 trigger";
-                if (player != null) player.PrintToChat(message);
-                else Console.WriteLine(message);
+                if (player != null)
+                    player.PrintToChat($" {Prefix} {ChatColors.Red} 动作必须是 enable、disable 或 trigger");
+                else
+                    Console.WriteLine(" [ZEP] 动作必须是 enable、disable 或 trigger");
             }
         }
 
