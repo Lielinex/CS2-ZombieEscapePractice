@@ -1,13 +1,13 @@
-﻿# Zombie Escape Practice 插件
+﻿﻿# Zombie Escape Practice 插件
 
-**Zombie Escape Practice** 是一个为 CS2 Zombie Escape 模式中的弹幕图、跳刀图设计的练习插件，允许玩家通过简单的菜单命令直接跳转到地图中的特定节点（跳刀、弹幕、BOSS 战），跳过冗长的跑图流程。基于 CounterStrikeSharp 开发，配置灵活，支持创意工坊地图 ID 自动识别，并提供高级命令块（重复、随机、延时）和投票功能。
+**Zombie Escape Practice** 是一个为 CS2 Zombie Escape 模式中的弹幕图、跳刀图设计的练习插件，允许玩家通过简单的菜单命令直接跳转到地图中的特定节点（跳刀、弹幕、BOSS 战），跳过冗长的跑图流程。基于 CounterStrikeSharp 开发，配置灵活，支持创意工坊地图 ID 自动识别，并提供命令块（重复、随机、延时）和投票功能。
 
 ## ✨ 特性
 
 - **快速跳转**：一键传送所有玩家到配置好的位置，并可设置视角朝向。
 - **灵活配置**：每个地图可配置多个训练节点，支持自定义触发命令，支持混合延时、重复、随机执行。
-- **动态命令块**：可为命令块指定 `targetname`，通过 `!zep` 命令动态启用/禁用/触发（如随机块）。
-- **投票功能**：内置全景投票系统，支持 `!vote_for` 和 `!vote_execute`（执行命令投票）。
+- **动态命令块**：可为命令块指定 `targetname`，通过 `!zep` 命令动态启用/禁用/触发。
+- **投票功能**：内置投票系统，支持 `!vote_for` 和 `!vote_execute`。
 - **功能开关**：可通过插件配置文件 `ZEPconfig.json` 单独启用/关闭练习、投票、调试功能。
 - **地图识别**：优先使用创意工坊地图 ID 作为配置键，兼容完整地图名。
 
@@ -29,6 +29,9 @@
   "EnablePractice": true,   // 开启练习菜单 (!prac)
   "EnableVote": true,       // 开启投票功能 (!vote_for, !vote_execute)
   "EnableDebug": false      // 调试模式：开启后玩家可使用 !zep 控制命令块；关闭后仅服务器控制台可用
+  "VoteRatio": 0.5,         // 投票通过所需比例（0-1）
+  "VoteDuration": 30.0,     // 投票持续时间（秒）
+  "VoteCustom": false       // 是否使用自定义投票界面（需要玩家有对应的本地化资源文件）
 }
 ```
 ### 2. 地图配置
@@ -106,6 +109,8 @@ random：随机选择块，mode 为 PickRandom（每次随机）或 PickRandomSh
 
 !vote_execute "<命令>" [说明] — 发起一个是否执行指定命令的投票，通过后服务器执行命令。命令需用引号括起（支持单引号或双引号），说明可选。
 
+!vote_restart — 发起重新开始游戏的投票。
+
 服务器控制台也可使用上述命令（前缀改为 css_，例如 css_vote_execute "say hello"）。
 
 ## 📋 投票所需 ConVar
@@ -117,7 +122,7 @@ sv_vote_allow_spectators 1
 sv_vote_count_spectator_votes 1
 
 ## 📁 文件结构
-
+```json
 csgo/addons/counterstrikesharp/
 ├── plugins/
 │   └── ZombieEscapePractice/
@@ -130,10 +135,10 @@ csgo/addons/counterstrikesharp/
                 ├── ze_example.json
                 ├── luciddream.json
                 └── ...
-
+```
 ## ⚠️ 注意事项
 
-服务器和客户端都需要有对应的resource/platform_<language>本地化文件支持投票界面显示（简体中文为 resource/platform_schinese.txt）。可以自行上传创意工坊，也可以通过创意工坊订阅我的资源包 [CASZE Practice Server Resources](https://steamcommunity.com/sharedfiles/filedetails/?id=3678363447) 来获取。
+服务器和客户端都需要有对应的resource/platform_<language>本地化文件支持投票界面显示（简体中文为platform_schinese.txt，放置于game/csgo/resource文件夹中）。
 
 坐标获取：游戏内开启控制台输入 cl_showpos 1 可查看当前位置。
 
@@ -153,4 +158,4 @@ csgo/addons/counterstrikesharp/
 
 本项目使用 MIT 许可证。详情请参见 [LICENSE](https://github.com/Lielinex/CS2-ZombieEscapePractice/tree/master?tab=MIT-1-ov-file) 文件。
 
-祝您练习愉快！ 🎉
+祝您早日成为ZE大神！ 🎉
