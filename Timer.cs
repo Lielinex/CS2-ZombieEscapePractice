@@ -1,6 +1,6 @@
 ﻿namespace ZombieEscapePractice
 {
-    public static class TimerManager
+    public static class Timer
     {
         private static List<CounterStrikeSharp.API.Modules.Timers.Timer> _activeTimers = new();
 

@@ -11,10 +11,12 @@ namespace ZombieEscapePractice
     public class PracticeManager
     {
         private readonly BasePlugin _plugin;
-        private readonly ConfigManager _configManager;
+        private readonly MapConfigLoader _configManager;
         private bool _isPracticeActive = false;
 
-        public PracticeManager(BasePlugin plugin, ConfigManager configManager)
+        public string Prefix = $" {ChatColors.Gold}[{ChatColors.Green}ZEP{ChatColors.Gold}]";
+
+        public PracticeManager(BasePlugin plugin, MapConfigLoader configManager)
         {
             _plugin = plugin;
             _configManager = configManager;
@@ -29,14 +31,14 @@ namespace ZombieEscapePractice
 
             if (_isPracticeActive)
             {
-                player.PrintToChat(" [训练] 当前已有激活的训练，请等待回合结束。");
+                player.PrintToChat(" {Prefix} {ChatColors.Red} 当前已有激活的训练，请等待回合结束。");
                 return;
             }
 
             string mapKey = GetCurrentMapKey();
             if (!_configManager.Config.TryGetValue(mapKey, out var challenges) || challenges.Count == 0)
             {
-                player.PrintToChat($" [训练] 当前地图 ({mapKey}) 没有配置可用的训练。");
+                player.PrintToChat($" {Prefix} {ChatColors.Red} 当前地图 ({mapKey}) 没有配置可用的训练。");
                 return;
             }
 
@@ -97,7 +99,7 @@ namespace ZombieEscapePractice
             {
                 if (player != null && player.IsValid)
                 {
-                    player.PrintToChat($" [训练] 已激活训练: {challenge.Name}，正在进行中...");
+                    player.PrintToChat($" {Prefix} {ChatColors.Red} 已激活训练: {challenge.Name}，正在进行中...");
                 }
             }
         }
@@ -133,7 +135,7 @@ namespace ZombieEscapePractice
                         if (totalDelay > 0)
                         {
                             var timer = _plugin.AddTimer(totalDelay, () => Server.ExecuteCommand(actualCmd), TimerFlags.STOP_ON_MAPCHANGE);
-                            TimerManager.AddTimer(timer);
+                            Timer.AddTimer(timer);
                         }
                         else
                         {
@@ -157,7 +159,7 @@ namespace ZombieEscapePractice
                 if (totalDelay > 0)
                 {
                     var timer = _plugin.AddTimer(totalDelay, () => Server.ExecuteCommand(actualCmd), TimerFlags.STOP_ON_MAPCHANGE);
-                    TimerManager.AddTimer(timer);
+                    Timer.AddTimer(timer);
                 }
                 else
                 {
