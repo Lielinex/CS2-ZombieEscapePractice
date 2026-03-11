@@ -65,8 +65,8 @@ namespace ZombieEscapePractice
 
             _voteHandler.Init();
 
-            // 根据配置选择标题
-            string title = _pluginConfig.VoteCustom ? "#SFUI_vote_panorama_vote_default" : "投票";
+            // 根据配置选择投票方法，之后再优化设置方法以适配不同颜色的键
+            string title = _pluginConfig.VoteCustom ? "#SFUI_vote_panorama_vote_default" : "#SFUI_Vote_loadbackup";
 
             bool success = _voteHandler.SendYesNoVoteToAll(
                 flDuration: _pluginConfig.VoteDuration,
@@ -76,7 +76,6 @@ namespace ZombieEscapePractice
                 resultCallback: (info) => VoteForResultCallback(info),
                 handler: VoteHandlerCallback
             );
-
             if (!success)
             {
                 if (player == null)
@@ -136,7 +135,7 @@ namespace ZombieEscapePractice
 
             _voteHandler.Init();
 
-            string title = _pluginConfig.VoteCustom ? "#SFUI_vote_panorama_vote_orange" : "执行命令";
+            string title = _pluginConfig.VoteCustom ? "#SFUI_vote_panorama_vote_orange" : "#SFUI_Vote_loadbackup";
 
             bool success = _voteHandler.SendYesNoVoteToAll(
                 flDuration: _pluginConfig.VoteDuration,
@@ -176,34 +175,14 @@ namespace ZombieEscapePractice
 
             _voteHandler.Init();
 
-            YesNoVoteResult resultCallback = (voteInfo) =>
-            {
-                int yes = voteInfo.yes_votes;
-                int no = voteInfo.no_votes;
-                int total = yes + no;
-
-                if (total == 0)
-                {
-                    Server.PrintToChatAll($"{Prefix} {ChatColors.Red}Vote ended with no votes.");
-                    return false;
-                }
-
-                float yesRatio = (float)yes / total;
-                bool passed = yesRatio >= ratio;
-
-                if (passed)
-                {
-                    Server.PrintToChatAll($"{Prefix} {ChatColors.Green}Vote passed ({yesRatio * 100:F1}%). Restarting match...");
-                    Server.ExecuteCommand("mp_restartgame 1");
-                }
-                else
-                {
-                    Server.PrintToChatAll($"{Prefix} {ChatColors.Red}Vote failed ({yesRatio * 100:F1}% yes, need {ratio * 100:F0}%).");
-                }
-                return passed;
-            };
-
-            _voteHandler.SendYesNoVoteToAll(duration, caller, "#SFUI_vote_restart_game", "", resultCallback);
+            bool success = _voteHandler.SendYesNoVoteToAll(
+                flDuration: _pluginConfig.VoteDuration,
+                iCaller: caller,
+                sVoteTitle: "#SFUI_vote_restart_game",
+                sDetailStr: "",
+                resultCallback: (info) => VoteRestartResultCallback(info),
+                handler: VoteHandlerCallback
+            );
         }
 
         private bool VoteForResultCallback(YesNoVoteInfo info)
@@ -230,6 +209,24 @@ namespace ZombieEscapePractice
             else
             {
                 Server.PrintToChatAll($"{Prefix} {ChatColors.Red} 投票未通过，命令不会执行。");
+            }
+            return passed;
+        }
+
+        private bool VoteRestartResultCallback(YesNoVoteInfo info)
+        {
+            int yes = info.yes_votes;
+            int no = info.no_votes;
+            int total = yes + no;
+            bool passed = total > 0 && (float)yes / total >= _pluginConfig.VoteRatio;
+            if (passed)
+            {
+                Server.PrintToChatAll($"{Prefix} {ChatColors.Green} 投票通过！正在重启回合...");
+                Server.ExecuteCommand("mp_restartgame 1");
+            }
+            else
+            {
+                Server.PrintToChatAll($"{Prefix} {ChatColors.Red} 投票未通过，回合不会重启。");
             }
             return passed;
         }
