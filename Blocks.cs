@@ -1,132 +1,313 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Timers;
+using CounterStrikeSharp.API.Modules.Utils;
 
 namespace ZombieEscapePractice
 {
-    public abstract class BlockBase
+    public class Blocks
     {
-        [JsonPropertyName("targetname")] public string? Targetname { get; set; }
-        [JsonIgnore] public bool Enabled { get; set; } = true;
+        private readonly BasePlugin _plugin;
+        private readonly MapConfigLoader _configManager;
+        private readonly PluginConfig _pluginConfig;
+        private Dictionary<string, BlockBase> _namedBlocks = new();
+        private Dictionary<string, BlockBase> _triggerableBlocks = new();
+        private Dictionary<string, CounterStrikeSharp.API.Modules.Timers.Timer> _repeatTimers = new();
 
-        public virtual bool StartDisabled { get; set; } = false;
-    }
+        public string Prefix = $" {ChatColors.Gold}[{ChatColors.Green}ZEP{ChatColors.Gold}]";
 
-    // 单次执行块（type = "once"）
-    public class OnceBlock : BlockBase
-    {
-        [JsonPropertyName("commands")]
-        public List<string> Commands { get; set; } = new();
-        [JsonPropertyName("startdisabled")] public bool StartDisabledProperty { get; set; } = false;
-
-        public override bool StartDisabled
+        public Blocks(BasePlugin plugin, MapConfigLoader configManager, PluginConfig pluginConfig)
         {
-            get => StartDisabledProperty;
-            set => StartDisabledProperty = value;
+            _plugin = plugin;
+            _configManager = configManager;
+            _pluginConfig = pluginConfig;
+            BuildNamedBlocks();
         }
-    }
 
-    // 重复执行块（type = "repeat"）
-    public class RepeatBlock : BlockBase
-    {
-        [JsonPropertyName("interval")] public float Interval { get; set; }
-        [JsonPropertyName("count")] public int? Count { get; set; } = -1; // -1为无限
-        [JsonPropertyName("commands")]
-        public List<string> Commands { get; set; } = new();
-        [JsonPropertyName("startdisabled")] public bool StartDisabledProperty { get; set; } = false;
-
-        public override bool StartDisabled
+        private void BuildNamedBlocks()
         {
-            get => StartDisabledProperty;
-            set => StartDisabledProperty = value;
-        }
-    }
+            _namedBlocks.Clear();
+            _triggerableBlocks.Clear();
+            _repeatTimers.Clear();
 
-    // 随机选择块（type = "random"）
-    public class RandomBlock : BlockBase
-    {
-        [JsonPropertyName("mode")] public string Mode { get; set; } = "PickRandom"; //值为PickRandom或PickRandomShuffle
-        [JsonPropertyName("commands")]
-        public List<string> Commands { get; set; } = new();
-        [JsonPropertyName("startdisabled")] public bool StartDisabledProperty { get; set; } = false;
-        [JsonIgnore] internal Queue<string>? ShuffleQueue;
-
-        public override bool StartDisabled
-        {
-            get => StartDisabledProperty;
-            set => StartDisabledProperty = value;
-        }
-    }
-
-    // 延迟块（type = "delay"）：将内部所有命令统一延迟 interval 秒
-    public class DelayBlock : BlockBase
-    {
-        [JsonPropertyName("interval")] public float Interval { get; set; }
-        [JsonPropertyName("commands")]
-        public List<string> Commands { get; set; } = new();
-        [JsonPropertyName("startdisabled")] public bool StartDisabledProperty { get; set; } = false;
-
-        public override bool StartDisabled
-        {
-            get => StartDisabledProperty;
-            set => StartDisabledProperty = value;
-        }
-    }
-
-    // 自定义转换器，用于反序列化 blocks 数组，根据 type 字段选择具体类型
-    public class BlockConverter : JsonConverter<List<BlockBase>>
-    {
-        public override List<BlockBase> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            if (reader.TokenType != JsonTokenType.StartArray)
-                throw new JsonException("blocks 字段必须是一个数组");
-
-            var list = new List<BlockBase>();
-
-            using var document = JsonDocument.ParseValue(ref reader);
-            var arrayEnumerator = document.RootElement.EnumerateArray();
-
-            int index = 0;
-            foreach (var element in arrayEnumerator)
+            foreach (var kv in _configManager.Config)
             {
-                Console.WriteLine($"[ZEP ConfigsHelper] 处理元素 {index}: {element.GetRawText()}");
-
-                if (element.ValueKind != JsonValueKind.Object)
-                    throw new JsonException($"blocks 数组第 {index} 个元素必须是对象，但遇到了 {element.ValueKind} 类型的值");
-
-                if (!element.TryGetProperty("type", out var typeProp))
-                    throw new JsonException($"blocks 数组中第 {index} 个元素缺少 type 字段");
-
-                string type = typeProp.GetString()?.ToLower() ?? "";
-                BlockBase? block = type switch
+                foreach (var challenge in kv.Value)
                 {
-                    "once" => JsonSerializer.Deserialize<OnceBlock>(element.GetRawText(), options),
-                    "repeat" => JsonSerializer.Deserialize<RepeatBlock>(element.GetRawText(), options),
-                    "random" => JsonSerializer.Deserialize<RandomBlock>(element.GetRawText(), options),
-                    "delay" => JsonSerializer.Deserialize<DelayBlock>(element.GetRawText(), options),
-                    _ => throw new JsonException($"未知块类型 '{type}' 在第 {index} 个元素")
-                };
+                    CollectNamedBlocks(challenge.Blocks);
+                }
+            }
+        }
 
-                if (block != null)
+        private void CollectNamedBlocks(List<BlockBase> blocks)
+        {
+            foreach (var block in blocks)
+            {
+                if (!string.IsNullOrEmpty(block.Targetname))
                 {
-                    block.Enabled = !block.StartDisabled;
-                    list.Add(block);
-                    Console.WriteLine($"[ZEP ConfigsHelper] 成功解析块类型: {type}, 名称: {block.Targetname ?? "unnamed"}, 初始状态: {(block.Enabled ? "启用" : "禁用")}");
+                    _namedBlocks[block.Targetname] = block;
+
+                    if (block is RandomBlock)
+                    {
+                        _triggerableBlocks[block.Targetname] = block;
+                    }
+                }
+            }
+        }
+
+        public void OnRoundStart()
+        {
+            CancelAllRepeatTimers();
+            _triggerableBlocks.Clear();
+        }
+
+        public void OnRoundEnd()
+        {
+            CancelAllRepeatTimers();
+            _triggerableBlocks.Clear();
+        }
+
+        private void CancelAllRepeatTimers()
+        {
+            foreach (var timer in _repeatTimers.Values)
+            {
+                timer.Kill();
+            }
+            _repeatTimers.Clear();
+        }
+
+        public void CommandZep(CCSPlayerController? player, CommandInfo command)
+        {
+            // 检查调试开关：如果调试关闭且是玩家执行，则拒绝
+            if (player != null && !_pluginConfig.EnableDebug)
+            {
+                player.PrintToChat($" {Prefix} {ChatColors.Red} 调试模式已关闭，无法使用此命令。");
+                return;
+            }
+
+            if (command.ArgCount < 3)
+            {
+                if (player != null)
+                    player.PrintToChat("{Prefix} {ChatColors.Red} 用法: !zep enable/disable/trigger <targetname>");
+                else
+                    Console.WriteLine(" [ZEP] 用法: !zep enable/disable/trigger <targetname>");
+                return;
+            }
+
+            string action = command.ArgByIndex(1).ToLower();
+            string target = command.ArgByIndex(2);
+
+            if (!_namedBlocks.TryGetValue(target, out var block))
+            {
+                if (player != null)
+                    player.PrintToChat($"{Prefix} {ChatColors.Red} 未找到名为 {target} 的命令块");
+                else
+                    Console.WriteLine($"[ZEP] 未找到名为 {target} 的命令块");
+                return;
+            }
+
+            if (action == "enable")
+            {
+                block.Enabled = true;
+                if (block is RepeatBlock repeatBlock)
+                {
+                    if (!_repeatTimers.ContainsKey(target) || IsTimerKilled(_repeatTimers[target]))
+                    {
+                        StartRepeatTimer(target, repeatBlock);
+                        if (player != null)
+                            player.PrintToChat($" {Prefix} {ChatColors.Red} 已启用并启动重复块: {target}");
+                        else
+                            Console.WriteLine($" [ZEP] 已启用并启动重复块: {target}");
+                    }
+                    else
+                    {
+                        if (player != null) player.PrintToChat($" {Prefix} {ChatColors.Red} 重复块 {target} 已经在运行中");
+                        else Console.WriteLine($" [ZEP] 重复块 {target} 已经在运行中");
+                    }
+                }
+                else
+                {
+                    if (player != null) player.PrintToChat($" {Prefix} {ChatColors.Red} 已启用命令块: {target}");
+                    else Console.WriteLine($" [ZEP] 已启用命令块: {target}");
+                }
+            }
+            else if (action == "disable")
+            {
+                block.Enabled = false;
+                if (block is RepeatBlock && _repeatTimers.ContainsKey(target))
+                {
+                    var timer = _repeatTimers[target];
+                    if (!IsTimerKilled(timer)) timer.Kill();
+                    _repeatTimers.Remove(target);
+                    if (player != null)
+                        player.PrintToChat($" {Prefix} {ChatColors.Red} 已禁用并停止重复块: {target}");
+                    else
+                        Console.WriteLine($" [ZEP] 已禁用并停止重复块: {target}");
+                }
+                else
+                {
+                    if (player != null)
+                        player.PrintToChat($" {Prefix} {ChatColors.Red} 已禁用命令块: {target}");
+                    else
+                        Console.WriteLine($" [ZEP] 已禁用命令块: {target}");
+                }
+            }
+            else if (action == "trigger")
+            {
+                // 检查块类型是否支持触发
+                if (block is RandomBlock)
+                {
+                    if (block.Enabled)
+                    {
+                        TriggerBlock(block);
+                        if (player != null)
+                            player.PrintToChat($" {Prefix} {ChatColors.Red} 已触发命令块: {target}");
+                        else
+                            Console.WriteLine($" [ZEP] 已触发命令块: {target}");
+                    }
+                    else
+                    {
+                        if (player != null) player.PrintToChat($" {Prefix} {ChatColors.Red} 命令块 {target} 当前处于禁用状态，无法触发");
+                        else Console.WriteLine($" [ZEP] 命令块 {target} 当前处于禁用状态，无法触发");
+                    }
+                }
+                else
+                {
+                    if (player != null) player.PrintToChat($" {Prefix} {ChatColors.Red} 命令块 {target} 不支持触发操作");
+                    else Console.WriteLine($" [ZEP] 命令块 {target} 不支持触发操作");
+                }
+            }
+            else
+            {
+                if (player != null)
+                    player.PrintToChat($" {Prefix} {ChatColors.Red} 动作必须是 enable、disable 或 trigger");
+                else
+                    Console.WriteLine(" [ZEP] 动作必须是 enable、disable 或 trigger");
+            }
+        }
+
+        private bool IsTimerKilled(CounterStrikeSharp.API.Modules.Timers.Timer timer) => timer == null;
+
+        private void StartRepeatTimer(string targetName, RepeatBlock repeatBlock)
+        {
+            if (!_namedBlocks.ContainsKey(targetName) || !(_namedBlocks[targetName] is RepeatBlock block))
+                return;
+
+            var executionState = new ExecutionState { Count = 0 };
+
+            Action executeAndSchedule = null;
+            executeAndSchedule = () =>
+            {
+                if (!block.Enabled || !(_namedBlocks.ContainsKey(targetName) && _namedBlocks[targetName] is RepeatBlock activeBlock && activeBlock.Enabled))
+                {
+                    if (_repeatTimers.ContainsKey(targetName) && !IsTimerKilled(_repeatTimers[targetName]))
+                    {
+                        _repeatTimers[targetName].Kill();
+                        _repeatTimers.Remove(targetName);
+                    }
+                    return;
                 }
 
-                index++;
-            }
+                ExecuteCommands(block.Commands, 0);
+                executionState.Count++;
 
-            return list;
+                if (block.Count.HasValue && block.Count.Value >= 0 && executionState.Count >= block.Count.Value)
+                {
+                    if (_repeatTimers.ContainsKey(targetName) && !IsTimerKilled(_repeatTimers[targetName]))
+                    {
+                        _repeatTimers[targetName].Kill();
+                        _repeatTimers.Remove(targetName);
+                    }
+                    return;
+                }
+
+                var newTimer = _plugin.AddTimer(block.Interval, executeAndSchedule, TimerFlags.STOP_ON_MAPCHANGE);
+                _repeatTimers[targetName] = newTimer;
+            };
+
+            var initialTimer = _plugin.AddTimer(block.Interval, executeAndSchedule, TimerFlags.STOP_ON_MAPCHANGE);
+            _repeatTimers[targetName] = initialTimer;
         }
 
-        public override void Write(Utf8JsonWriter writer, List<BlockBase> value, JsonSerializerOptions options)
+        private void ExecuteCommands(List<string> commands, float baseDelay)
         {
-            writer.WriteStartArray();
-            foreach (var block in value)
+            foreach (var cmd in commands)
             {
-                JsonSerializer.Serialize(writer, block, block.GetType(), options);
+                var (delay, actualCmd) = ParseCommandString(cmd);
+                float totalDelay = baseDelay + delay;
+                if (totalDelay > 0)
+                {
+                    var timer = _plugin.AddTimer(totalDelay, () => Server.ExecuteCommand(actualCmd), TimerFlags.STOP_ON_MAPCHANGE);
+                    Timer.AddTimer(timer);
+                }
+                else
+                {
+                    Server.ExecuteCommand(actualCmd);
+                }
             }
-            writer.WriteEndArray();
+        }
+
+        private (float delay, string command) ParseCommandString(string cmd)
+        {
+            string trimmed = cmd.Trim();
+            if (trimmed.StartsWith("[delay="))
+            {
+                int endIdx = trimmed.IndexOf(']');
+                if (endIdx > 0)
+                {
+                    string delayStr = trimmed.Substring(7, endIdx - 7);
+                    if (float.TryParse(delayStr, out float delay))
+                        return (delay, trimmed.Substring(endIdx + 1).Trim());
+                }
+            }
+            return (0f, trimmed);
+        }
+
+        private void TriggerBlock(BlockBase block)
+        {
+            if (block is RandomBlock randomBlock)
+            {
+                ExecuteRandomBlock(randomBlock, 0f);
+            }
+        }
+
+        private void ExecuteRandomBlock(RandomBlock randomBlock, float baseDelay)
+        {
+            if (randomBlock.Commands.Count == 0) return;
+
+            string selectedCmd;
+            if (randomBlock.Mode.ToLower() == "pickrandomshuffle")
+            {
+                if (randomBlock.ShuffleQueue == null || randomBlock.ShuffleQueue.Count == 0)
+                {
+                    var shuffled = randomBlock.Commands.OrderBy(x => Guid.NewGuid()).ToList();
+                    randomBlock.ShuffleQueue = new Queue<string>(shuffled);
+                }
+                selectedCmd = randomBlock.ShuffleQueue.Dequeue();
+            }
+            else
+            {
+                int idx = new Random().Next(randomBlock.Commands.Count);
+                selectedCmd = randomBlock.Commands[idx];
+            }
+
+            var (delay, actualCmd) = ParseCommandString(selectedCmd);
+            float totalDelay = baseDelay + delay;
+            if (totalDelay > 0)
+            {
+                var timer = _plugin.AddTimer(totalDelay, () => Server.ExecuteCommand(actualCmd), TimerFlags.STOP_ON_MAPCHANGE);
+                Timer.AddTimer(timer);
+            }
+            else
+            {
+                Server.ExecuteCommand(actualCmd);
+            }
+        }
+
+        private class ExecutionState
+        {
+            public int Count { get; set; }
         }
     }
 }

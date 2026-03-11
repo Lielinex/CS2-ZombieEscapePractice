@@ -14,8 +14,8 @@ namespace ZombieEscapePractice
         public string Prefix = $" {ChatColors.Gold}[{ChatColors.Green}ZEP{ChatColors.Gold}]";
 
         private PluginConfig _pluginConfig;
-        private ConfigManager _configManager;
-        private BlockManager _blockManager;
+        private MapConfigLoader _configManager;
+        private Blocks _blockManager;
         private PracticeManager? _practiceManager;
         private VoteManager? _voteManager;
         private CPanoramaVote? _voteHandler;
@@ -27,10 +27,10 @@ namespace ZombieEscapePractice
             _pluginConfig = PluginConfig.Load(configPath);
             Console.WriteLine($"[ZombieEscapePractice] ≈‰÷√º”‘ÿÕÍ≥…: Practice={_pluginConfig.EnablePractice}, Vote={_pluginConfig.EnableVote}, Debug={_pluginConfig.EnableDebug}");
 
-            _configManager = new ConfigManager();
+            _configManager = new MapConfigLoader();
             _configManager.Load(ModuleDirectory);
 
-            _blockManager = new BlockManager(this, _configManager, _pluginConfig);
+            _blockManager = new Blocks(this, _configManager, _pluginConfig);
             AddCommand("css_zep", "øÿ÷∆—µ¡∑√¸¡ÓøÈ (enable/disable/trigger <targetname>)", (player, info) => _blockManager.CommandZep(player, info));
 
             if (_pluginConfig.EnablePractice)
@@ -63,7 +63,7 @@ namespace ZombieEscapePractice
         {
             _blockManager?.OnRoundStart();
             _practiceManager?.OnRoundStart();
-            TimerManager.CancelAll();
+            Timer.CancelAll();
             return HookResult.Continue;
         }
 
@@ -71,13 +71,13 @@ namespace ZombieEscapePractice
         {
             _blockManager?.OnRoundEnd();
             _practiceManager?.OnRoundEnd();
-            TimerManager.CancelAll();
+            Timer.CancelAll();
             return HookResult.Continue;
         }
 
         public override void Unload(bool hotReload)
         {
-            TimerManager.CancelAll();
+            Timer.CancelAll();
             base.Unload(hotReload);
         }
     }

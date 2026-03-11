@@ -28,7 +28,7 @@ namespace ZombieEscapePractice
         public List<BlockBase> Blocks { get; set; } = new();
     }
 
-    public class ConfigManager()
+    public class MapConfigLoader()
     {
         private string _mapsFolderPath;
         public Dictionary<string, List<ChallengeConfig>> Config { get; private set; } = new();
