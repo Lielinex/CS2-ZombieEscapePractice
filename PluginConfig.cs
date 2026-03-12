@@ -23,6 +23,9 @@ namespace ZombieEscapePractice
         [JsonPropertyName("VoreDuration")]
         public float VoteDuration { get; set; } = 30.0f;
 
+        [JsonPropertyName("EnableWASDMenu")]
+        public bool EnableWASDMenu { get; set; } = false;
+
         public static PluginConfig Load(string configPath)
         {
             string? directory = Path.GetDirectoryName(configPath);
