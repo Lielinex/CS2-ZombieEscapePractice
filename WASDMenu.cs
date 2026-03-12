@@ -25,7 +25,7 @@ namespace ZombieEscapePractice
         public List<WASDMenuOption> Options { get; set; } = new();
         public int SelectedIndex { get; set; } = 0;
         public int StartOffset { get; set; } = 0;
-        private const int MaxVisibleOptions = 4;
+        private const int MaxVisibleOptions = 5;
 
         public string Render()
         {
@@ -96,7 +96,6 @@ namespace ZombieEscapePractice
             if (_playerMenus.ContainsKey(player.Slot))
             {
                 _playerMenus.Remove(player.Slot);
-                player.PrintToCenterHtml(""); // 清空中心HTML
             }
         }
 
@@ -114,38 +113,41 @@ namespace ZombieEscapePractice
             foreach (var player in players)
             {
                 if (!player.IsValid || player.IsBot || player.IsHLTV) continue;
-                if (!_playerMenus.TryGetValue(player.Slot, out var menu)) continue;
 
-                var buttons = player.Buttons;
-                // 检测按键按下（上升沿）
-                if (!_prevButtons.ContainsKey(player.Slot))
-                    _prevButtons[player.Slot] = PlayerButtons.Alt1;
-
-                var prev = _prevButtons[player.Slot];
-                var pressed = buttons & ~prev;
-
-                if ((pressed & PlayerButtons.Forward) != 0)
+                if (_playerMenus.TryGetValue(player.Slot, out var menu))
                 {
-                    menu.ScrollUp();
                     RenderMenu(player);
-                }
-                else if ((pressed & PlayerButtons.Back) != 0)
-                {
-                    menu.ScrollDown();
-                    RenderMenu(player);
-                }
-                else if ((pressed & PlayerButtons.Use) != 0) // E 键
-                {
-                    var selectedOption = menu.Options[menu.SelectedIndex];
-                    selectedOption.Action(player);
-                    CloseMenu(player);
-                }
-                else if ((pressed & PlayerButtons.Reload) != 0) // R 键
-                {
-                    CloseMenu(player);
-                }
 
-                _prevButtons[player.Slot] = buttons;
+                    var buttons = player.Buttons;
+                    if (!_prevButtons.ContainsKey(player.Slot))
+                        _prevButtons[player.Slot] = 0;
+
+                    var prev = _prevButtons[player.Slot];
+                    var pressed = buttons & ~prev;
+
+                    if ((pressed & PlayerButtons.Forward) != 0)
+                    {
+                        menu.ScrollUp();
+                        RenderMenu(player);
+                    }
+                    else if ((pressed & PlayerButtons.Back) != 0)
+                    {
+                        menu.ScrollDown();
+                        RenderMenu(player);
+                    }
+                    else if ((pressed & PlayerButtons.Use) != 0)
+                    {
+                        var selectedOption = menu.Options[menu.SelectedIndex];
+                        selectedOption.Action(player);
+                        CloseMenu(player);
+                    }
+                    else if ((pressed & PlayerButtons.Reload) != 0)
+                    {
+                        CloseMenu(player);
+                    }
+
+                    _prevButtons[player.Slot] = buttons;
+                }
             }
         }
 
