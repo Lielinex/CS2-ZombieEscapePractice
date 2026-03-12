@@ -1,0 +1,44 @@
+{
+  "ze_neochrome": [
+    {
+      "name": "Boss",
+      "position": {"x": 3154.960693, "y": 6262.199707, "z": -2415.968750},
+      "angle": {"pitch":0.000000 ,"yaw": 0.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "[delay=1]c_entfire nut_door9_relay2 Trigger",
+            "[delay=3]c_entfire nut_music1 StopSound",
+            "[delay=3]c_entfire nut_music2 StopSound",
+            "[delay=3]c_entfire nut_music3 StopSound",
+            "[delay=3]c_entfire nut_p2_music1 StopSound",
+            "[delay=3]c_entfire nut_p2_music2 StopSound",
+            "[delay=3]c_entfire nut_p3_music StopSound"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "弹幕",
+      "position": {"x": 9181.077148, "y": -5937.016602, "z": -1623.968750},
+      "angle": {"pitch":0.000000 ,"yaw": 90.000000 ,"roll": 0.000000},
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "[delay=1]c_entfire nut_final_sphere_counter SetValue 0",
+            "[delay=1]c_entfire nut_final_sphere_counter SetValue 0",
+            "[delay=3]c_entfire nut_boss_music StopSound",
+            "[delay=3]c_entfire nut_music1 StopSound",
+            "[delay=3]c_entfire nut_music2 StopSound",
+            "[delay=3]c_entfire nut_music3 StopSound",
+            "[delay=3]c_entfire nut_p2_music1 StopSound",
+            "[delay=3]c_entfire nut_p2_music2 StopSound",
+            "[delay=3]c_entfire nut_p3_music StopSound"
+          ]
+        }
+      ]
+    }
+  ]
+}
