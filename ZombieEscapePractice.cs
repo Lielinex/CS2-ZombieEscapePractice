@@ -1,6 +1,8 @@
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Config;
 using CounterStrikeSharp.API.Modules.Utils;
 using PanoramaVote;
+using static CounterStrikeSharp.API.Core.Listeners;
 
 namespace ZombieEscapePractice
 {
@@ -9,7 +11,7 @@ namespace ZombieEscapePractice
         public override string ModuleName => "ZombieEscapePractice";
         public override string ModuleDescription => "Ω© ¨Ã”≈‹µØƒªÕº¡∑œ∞≤Âº˛";
         public override string ModuleAuthor => "Lielinex";
-        public override string ModuleVersion => "1.0.1";
+        public override string ModuleVersion => "1.1.3";
 
         public string Prefix = $" {ChatColors.Gold}[{ChatColors.Green}ZEP{ChatColors.Gold}]";
 
@@ -19,6 +21,7 @@ namespace ZombieEscapePractice
         private PracticeManager? _practiceManager;
         private VoteManager? _voteManager;
         private CPanoramaVote? _voteHandler;
+        private WASDMenuManager? _wasdMenuManager;
 
         public override void Load(bool hotReload)
         {
@@ -33,9 +36,12 @@ namespace ZombieEscapePractice
             _blockManager = new Blocks(this, _configManager, _pluginConfig);
             AddCommand("css_zep", "øÿ÷∆—µ¡∑√¸¡ÓøÈ (enable/disable/trigger <targetname>)", (player, info) => _blockManager.CommandZep(player, info));
 
+            _wasdMenuManager = new WASDMenuManager(this);
+            RegisterListener<Listeners.OnTick>(OnTick);
+
             if (_pluginConfig.EnablePractice)
             {
-                _practiceManager = new PracticeManager(this, _configManager);
+                _practiceManager = new PracticeManager(this, _configManager, _pluginConfig, _wasdMenuManager);
                 AddCommand("css_practice", "¥Úø™—µ¡∑≤Àµ•", (player, info) => _practiceManager.CommandPractice(player, info));
                 AddCommand("css_prac", "¥Úø™—µ¡∑≤Àµ•", (player, info) => _practiceManager.CommandPractice(player, info));
             }
@@ -57,6 +63,10 @@ namespace ZombieEscapePractice
             });
 
             Console.WriteLine("[ZombieEscapePractice] º”‘ÿÕÍ≥…£°");
+        }
+        private void OnTick()
+        {
+            _wasdMenuManager?.OnTick();
         }
 
         private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)

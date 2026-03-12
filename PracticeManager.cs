@@ -1,10 +1,12 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Config;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Menu;
 using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Modules.Utils;
+using McMaster.NETCore.Plugins;
 
 namespace ZombieEscapePractice
 {
@@ -12,14 +14,18 @@ namespace ZombieEscapePractice
     {
         private readonly BasePlugin _plugin;
         private readonly MapConfigLoader _configManager;
+        private WASDMenuManager? _wasdMenuManager;
+        private PluginConfig _pluginConfig;
         private bool _isPracticeActive = false;
 
         public string Prefix = $" {ChatColors.Gold}[{ChatColors.Green}ZEP{ChatColors.Gold}]";
 
-        public PracticeManager(BasePlugin plugin, MapConfigLoader configManager)
+        public PracticeManager(BasePlugin plugin, MapConfigLoader configManager, PluginConfig pluginConfig, WASDMenuManager? wasdMenuManager)
         {
             _plugin = plugin;
             _configManager = configManager;
+            _pluginConfig = pluginConfig;
+            _wasdMenuManager = wasdMenuManager;
         }
 
         public void OnRoundStart() => _isPracticeActive = false;
@@ -31,7 +37,7 @@ namespace ZombieEscapePractice
 
             if (_isPracticeActive)
             {
-                player.PrintToChat(" {Prefix} {ChatColors.Red} 当前已有激活的训练，请等待回合结束。");
+                player.PrintToChat($" {Prefix} {ChatColors.Red} 当前已有激活的训练，请等待回合结束。");
                 return;
             }
 
@@ -42,7 +48,23 @@ namespace ZombieEscapePractice
                 return;
             }
 
-            ShowChallengeMenu(player, challenges);
+            if (_pluginConfig.EnableWASDMenu)
+            {
+                // 构建WASD菜单选项
+                var options = new List<WASDMenuOption>();
+                foreach (var challenge in challenges)
+                {
+                    options.Add(new WASDMenuOption(challenge.Name, (p) =>
+                    {
+                        ExecuteChallenge(challenge);
+                    }));
+                }
+                _wasdMenuManager?.OpenMenu(player, "选择训练节点", options);
+            }
+            else
+            {
+                ShowChallengeMenu(player, challenges);
+            }
         }
 
         private string GetCurrentMapKey()
