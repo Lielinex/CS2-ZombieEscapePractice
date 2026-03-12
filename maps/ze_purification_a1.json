@@ -1,0 +1,39 @@
+{
+  "ze_purification_a1": [
+    {
+      "name": "关卡-1",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire button_lvl1 Press",
+            "css_vote_execute 'endround' 更换至关卡-1，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "关卡-2",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire button_lvl2 Press",
+            "css_vote_execute 'endround' 更换至关卡-2，结束当前回合以立即更换关卡？"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "关卡-2 跳刀",
+      "blocks": [
+        {
+          "type": "once",
+          "commands": [
+            "c_entfire button_lv2train Press"
+          ]
+        }
+      ]
+    }
+  ]
+}
