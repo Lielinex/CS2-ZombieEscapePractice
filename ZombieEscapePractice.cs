@@ -11,7 +11,7 @@ namespace ZombieEscapePractice
         public override string ModuleName => "ZombieEscapePractice";
         public override string ModuleDescription => "½©Ê¬ÌÓÅÜµ¯Ä»Í¼Á·Ï°²å¼þ";
         public override string ModuleAuthor => "Lielinex";
-        public override string ModuleVersion => "1.1.2";
+        public override string ModuleVersion => "1.1.3";
 
         public string Prefix = $" {ChatColors.Gold}[{ChatColors.Green}ZEP{ChatColors.Gold}]";
 
