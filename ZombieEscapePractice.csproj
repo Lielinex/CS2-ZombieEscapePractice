@@ -8,6 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Remove="tests/**/*.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="CounterStrikeSharp.API" Version="*">
 			<HintPath>D:/dev/CS2PluginsDev/addons/counterstrikesharp/api/CounterStrikeSharp.API.dll</HintPath>
 	    </PackageReference>

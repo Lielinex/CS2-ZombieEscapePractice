@@ -54,6 +54,8 @@ namespace ZombieEscapePractice
                 AddCommand("css_vote_restart", "发起一个重启回合投票，格式: !vote_restart", (player, info) => _voteManager.CommandVoteRestart(player, info));
             }
 
+            _ = new SilentChatCommands(this);
+
             RegisterEventHandler<EventRoundStart>(OnRoundStart);
             RegisterEventHandler<EventRoundEnd>(OnRoundEnd);
             RegisterEventHandler<EventVoteCast>((@event, info) =>
